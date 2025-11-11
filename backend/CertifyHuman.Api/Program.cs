@@ -5,6 +5,7 @@ using CertifyHuman.Api.Options;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
+using System.IO;
 
 Env.Load();
 
@@ -21,8 +22,9 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod());
 });
 
+var dbPath = Path.Combine(AppContext.BaseDirectory, "certifyhuman.db");
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite($"Data Source={dbPath}"));
 
 builder.Services.AddSingleton(new StripeSettings { SecretKey = stripeSecret ?? string.Empty });
 builder.Services.AddEndpointsApiExplorer();
