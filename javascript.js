@@ -703,32 +703,37 @@ async function handleCertificateSubmit(event) {
         return;
     }
 
-    const attachments = attachmentInput ? await collectAttachments(attachmentInput.files) : [];
-    const code = generateCertificateCode();
-    const normalizedCode = normalizeCode(code);
-    const certificate = {
-        code: normalizedCode,
+    const data = {
         title,
         creator,
         email,
         type,
-        desc,
-        aiUsage,
-        issuedAt: new Date().toISOString(),
-        attachments
+        description: desc,
+        aiUsage
     };
 
-    issuedCertificates.set(normalizedCode, certificate);
-    persistCertificates();
-    displayCertificate(certificate);
-    renderQr(normalizedCode);
-    renderAttachmentPreview(attachments);
-    if (attachmentInput) {
-        attachmentInput.value = "";
-        displaySelectedEvidence([]);
+    try {
+        const response = await fetch("https://certifyhuman.onrender.com/api/certificates/new", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) throw new Error("Nie udało się połączyć z backendem.");
+
+        const certificate = await response.json();
+
+        displayCertificate(certificate);
+        renderQr(certificate.code);
+        form.reset();
+    } catch (error) {
+        console.error("Błąd API:", error);
+        alert("Wystąpił błąd podczas generowania certyfikatu.");
     }
-    form.reset();
 }
+
 
 function generateCertificateCode() {
     const part1 = Math.floor(100000 + Math.random() * 900000);
@@ -787,7 +792,8 @@ function runVerification() {
         return;
     }
 
-    const { normalized, certificate } = lookupCertificate(raw);
+    const { normalized, certificate } = await lookupCertificate(raw);
+
     verifyResult.innerHTML = buildVerificationMessage(normalized, certificate);
 }
 
@@ -802,7 +808,8 @@ function handleStandaloneVerification() {
     }
 
     toggleOrbit(true);
-    const { normalized, certificate } = lookupCertificate(raw);
+    const { normalized, certificate } = await lookupCertificate(raw);
+
 
     lastStandaloneResult = {
         code: normalized,
@@ -923,13 +930,21 @@ function renderStandaloneFeedback(code, certificate, isValid) {
     `;
 }
 
-function lookupCertificate(rawValue) {
+async function lookupCertificate(rawValue) {
     const normalized = normalizeCode(rawValue || "");
-    if (!normalized) {
-        return { normalized: "", certificate: null };
+    if (!normalized) return { normalized: "", certificate: null };
+
+    try {
+        const res = await fetch(`https://certifyhuman.onrender.com/api/certificates/${normalized}`);
+        if (!res.ok) return { normalized, certificate: null };
+        const cert = await res.json();
+        return { normalized, certificate: cert };
+    } catch (err) {
+        console.error("Błąd podczas weryfikacji:", err);
+        return { normalized, certificate: null };
     }
-    return { normalized, certificate: issuedCertificates.get(normalized) || null };
 }
+
 
 function buildVerificationMessage(normalized, certificate) {
     if (!normalized) {
