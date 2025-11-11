@@ -14,10 +14,16 @@ builder.Configuration.AddEnvironmentVariables();
 
 var stripeSecret = ResolveStripeSecret(builder.Configuration);
 
+var allowedOrigins = new[]
+{
+    "http://localhost:5500",
+    "https://twoja-domena.vercel.app"
+};
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("frontend", policy =>
-        policy.WithOrigins("http://localhost:5500")
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod());
 });

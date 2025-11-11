@@ -197,6 +197,9 @@ const translations = {
         "attachments.none": "Załączniki: brak (pole opcjonalne).",
         "attachments.previewUnavailable": "Podgląd niedostępny ({type})",
         "messages.enterCode": "Wpisz prawidłowy kod certyfikatu.",
+        "messages.notFound": "Nie znaleziono certyfikatu.",
+        "messages.createError": "Wystąpił problem podczas generowania certyfikatu.",
+        "messages.verifyError": "Nie udało się zweryfikować certyfikatu.",
         "verify.redirectStatus": "Kod aktywny",
         "verify.inlineEmpty": "Podaj kod, aby rozpocząć weryfikację.",
         "buttons.copySuccess": "Skopiowano!",
@@ -410,6 +413,9 @@ const translations = {
         "attachments.none": "Attachments: none (optional field).",
         "attachments.previewUnavailable": "Preview unavailable ({type})",
         "messages.enterCode": "Enter a valid certificate code.",
+        "messages.notFound": "Certificate not found.",
+        "messages.createError": "We couldn't generate the certificate. Try again.",
+        "messages.verifyError": "Verification failed. Please retry.",
         "verify.redirectStatus": "Code active",
         "verify.inlineEmpty": "Enter a code to start verification.",
         "buttons.copySuccess": "Copied!",
@@ -431,6 +437,7 @@ const storageKey = "certifyHumanCertificates";
 const MAX_ATTACHMENTS = 5;
 const MAX_IMAGE_PREVIEW_SIZE = 3 * 1024 * 1024;
 const issuedCertificates = new Map();
+const API_BASE_URL = "https://certifyhuman.onrender.com";
 
 const form = document.getElementById("certificateForm");
 const codeResult = document.getElementById("codeResult");
@@ -652,7 +659,7 @@ function initVerifyPage() {
     }
 }
 
-function initCertificatePage() {
+async function initCertificatePage() {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
 
@@ -661,11 +668,10 @@ function initCertificatePage() {
         return;
     }
 
-    const normalized = normalizeCode(code);
-    const certificate = issuedCertificates.get(normalized);
+    const { normalized, certificate } = await verifyCertificate(code);
 
     if (!certificate) {
-        renderMissingCertificate(normalized);
+        renderMissingCertificate(normalized || code);
         return;
     }
 
@@ -685,6 +691,92 @@ function bootstrapInlineQuery() {
         verifyInput.value = codeFromQuery.trim();
         runVerification();
         scrollToSection("verify");
+    }
+}
+
+function formatCertificateForUi(payload = {}, defaults = {}) {
+    return {
+        code: payload.code ?? defaults.code ?? "",
+        title: payload.title ?? defaults.title ?? "",
+        creator: payload.creator ?? defaults.creator ?? "",
+        email: payload.email ?? defaults.email ?? "",
+        type: payload.type ?? defaults.type ?? "",
+        aiUsage: payload.aiUsage ?? defaults.aiUsage ?? "",
+        desc: payload.description ?? defaults.desc ?? "",
+        description: payload.description ?? defaults.description ?? "",
+        attachments: payload.attachments ?? defaults.attachments ?? [],
+        issuedAt: payload.createdAt ?? defaults.issuedAt ?? new Date().toISOString(),
+        status: payload.status ?? defaults.status ?? "",
+        paymentLink: payload.paymentLink ?? defaults.paymentLink,
+        paymentId: payload.paymentId ?? defaults.paymentId
+    };
+}
+
+async function createCertificate(payload) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/certificates/new`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.status !== 201) {
+            console.error("Unexpected status while creating certificate:", response.status);
+            alert(t("messages.createError"));
+            return null;
+        }
+
+        const created = await response.json();
+        return formatCertificateForUi(
+            {
+                code: created.code,
+                status: created.status,
+                paymentLink: created.paymentLink,
+                paymentId: created.paymentId
+            },
+            {
+                title: payload.title,
+                creator: payload.creator,
+                email: payload.email,
+                type: payload.type,
+                aiUsage: payload.aiUsage,
+                desc: payload.description,
+                description: payload.description,
+                attachments: payload.attachments ?? [],
+                issuedAt: new Date().toISOString()
+            }
+        );
+    } catch (error) {
+        console.error("Błąd API:", error);
+        alert(t("messages.createError"));
+        return null;
+    }
+}
+
+async function verifyCertificate(rawValue) {
+    const normalized = normalizeCode(rawValue || "");
+    if (!normalized) {
+        return { normalized: "", certificate: null };
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/certificates/${normalized}`);
+
+        if (response.status === 404) {
+            return { normalized, certificate: null };
+        }
+
+        if (!response.ok) {
+            throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        const certificate = formatCertificateForUi(data);
+        return { normalized, certificate };
+    } catch (error) {
+        console.error("Błąd podczas weryfikacji:", error);
+        alert(t("messages.verifyError"));
+        return { normalized, certificate: null };
     }
 }
 
@@ -709,29 +801,19 @@ async function handleCertificateSubmit(event) {
         email,
         type,
         description: desc,
-        aiUsage
+        aiUsage,
+        attachments: []
     };
 
-    try {
-        const response = await fetch("https://certifyhuman.onrender.com/api/certificates/new", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        });
-
-        if (!response.ok) throw new Error("Nie udało się połączyć z backendem.");
-
-        const certificate = await response.json();
-
-        displayCertificate(certificate);
-        renderQr(certificate.code);
-        form.reset();
-    } catch (error) {
-        console.error("Błąd API:", error);
-        alert("Wystąpił błąd podczas generowania certyfikatu.");
+    const certificate = await createCertificate(data);
+    if (!certificate) {
+        return;
     }
+
+    displayCertificate(certificate);
+    renderQr(certificate.code);
+    form?.reset();
+    renderAttachmentPreview([]);
 }
 
 
@@ -783,7 +865,7 @@ function renderQr(code) {
     });
 }
 
-function runVerification() {
+async function runVerification() {
     if (!verifyInput || !verifyResult) return;
     const raw = verifyInput.value.trim();
 
@@ -792,12 +874,12 @@ function runVerification() {
         return;
     }
 
-    const { normalized, certificate } = await lookupCertificate(raw);
+    const { normalized, certificate } = await verifyCertificate(raw);
 
     verifyResult.innerHTML = buildVerificationMessage(normalized, certificate);
 }
 
-function handleStandaloneVerification() {
+async function handleStandaloneVerification() {
     if (!standaloneInput || !standaloneFeedback) return;
 
     const raw = standaloneInput.value.trim();
@@ -808,7 +890,7 @@ function handleStandaloneVerification() {
     }
 
     toggleOrbit(true);
-    const { normalized, certificate } = await lookupCertificate(raw);
+    const { normalized, certificate } = await verifyCertificate(raw);
 
 
     lastStandaloneResult = {
@@ -917,6 +999,7 @@ function renderStandaloneFeedback(code, certificate, isValid) {
         const safeCode = escapeHtml(code);
         standaloneFeedback.innerHTML = `
             <div class="status-label status-invalid">${t("verify.invalidTitle")}</div>
+            <p>${t("messages.notFound")}</p>
             <p>${formatMessage("verify.invalidDescription", { code: safeCode })}</p>
             <p>${t("verify.invalidHint")}</p>
         `;
@@ -930,20 +1013,6 @@ function renderStandaloneFeedback(code, certificate, isValid) {
     `;
 }
 
-async function lookupCertificate(rawValue) {
-    const normalized = normalizeCode(rawValue || "");
-    if (!normalized) return { normalized: "", certificate: null };
-
-    try {
-        const res = await fetch(`https://certifyhuman.onrender.com/api/certificates/${normalized}`);
-        if (!res.ok) return { normalized, certificate: null };
-        const cert = await res.json();
-        return { normalized, certificate: cert };
-    } catch (err) {
-        console.error("Błąd podczas weryfikacji:", err);
-        return { normalized, certificate: null };
-    }
-}
 
 
 function buildVerificationMessage(normalized, certificate) {
@@ -955,6 +1024,7 @@ function buildVerificationMessage(normalized, certificate) {
         const safe = escapeHtml(normalized);
         return `
             <div class="status-label status-invalid">${t("verify.invalidTitle")}</div>
+            <p>${t("messages.notFound")}</p>
             <p>${formatMessage("verify.invalidDescription", { code: safe })}</p>
             <p>${t("verify.invalidHint")}</p>
         `;
