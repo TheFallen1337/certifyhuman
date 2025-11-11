@@ -149,6 +149,13 @@ app.MapPost("/api/certificates/{code}/reject", async (string code, DecisionReque
     return Results.Ok(ToResponse(certificate));
 }).WithName("RejectCertificate");
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated(); // Utworzy bazę i tabele jeśli jeszcze nie istnieją
+}
+
+
 app.Run();
 
 static CertificateResponse ToResponse(Certificate c) => new(
