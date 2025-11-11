@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>O nas | CertifyHuman</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script defer src="javascript.js"></script>
+</head>
+<body data-page="about">
+<header>
+    <div class="nav">
+        <div class="logo">
+            <span class="icon"></span>
+            <span>CERTIFYHUMAN</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html#how" data-i18n="nav.how">Jak to działa</a>
+            <a href="index.html#generate" data-i18n="nav.generate">Wydaj certyfikat</a>
+            <a href="verify.html" class="nav-link-verify" data-i18n="nav.verify">Zweryfikuj kod</a>
+            <a href="about.html" class="active" data-i18n="nav.about">O nas</a>
+        </div>
+        <div class="nav-actions">
+            <a class="nav-cta" href="index.html#generate">
+                <span data-i18n="nav.cta">Get certificate</span>
+            </a>
+            <button class="lang-toggle" id="langToggle" type="button" aria-label="Change language">
+                <span class="lang-flag" id="langFlag" aria-hidden="true">🇺🇸</span>
+                <span class="lang-label" id="langLabel">EN</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="card about-card">
+        <div class="about-grid">
+            <div>
+                <span class="pill" data-i18n="about.pill">O nas</span>
+                <h1 data-i18n="aboutPage.heading">Manifest CertifyHuman</h1>
+                <p data-i18n="aboutPage.lead">
+                    Wierzymy, że internet nadal może wskazywać prawdziwych autorów. Dlatego budujemy ekosystem certyfikatów,
+                    które jasno pokazują, gdzie kończy się wsparcie AI, a zaczyna praca człowieka.
+                </p>
+                <ul class="info-list">
+                    <li data-i18n="aboutPage.point1">Tworzymy otwarty standard CH-XXXXXX-XXXXXX, gotowy do integracji z CMS i marketplace’ami.</li>
+                    <li data-i18n="aboutPage.point2">Projektujemy doświadczenia dla twórców, wydawców i marek — bez konieczności kodowania.</li>
+                    <li data-i18n="aboutPage.point3">Współpracujemy z partnerami technologicznymi, by dostarczyć API, webhooki i automatyczną weryfikację.</li>
+                </ul>
+            </div>
+            <div class="about-highlight">
+                <h4 data-i18n="aboutPage.valuesTitle">Nasze wartości</h4>
+                <p data-i18n="aboutPage.valuesBody">
+                    Transparentność, odpowiedzialność i inkluzywność twórców. Chcemy, by każdy mógł pokazać, że stoi za nim zespół ludzi — niezależnie
+                    od tego, czy korzystał z AI pomocniczo, czy nie korzystał wcale.
+                </p>
+                <div class="about-metrics">
+                    <div>
+                        <strong>2024</strong>
+                        <span data-i18n="aboutPage.metric1">start programu beta</span>
+                    </div>
+                    <div>
+                        <strong>12+</strong>
+                        <span data-i18n="aboutPage.metric2">zespołów w pilotażu</span>
+                    </div>
+                    <div>
+                        <strong>5</strong>
+                        <span data-i18n="aboutPage.metric3">kontynentów w roadmapie</span>
+                    </div>
+                </div>
+                <a class="btn-secondary" href="mailto:hello@certifyhuman.com" data-i18n="aboutPage.cta">Dołącz do programu partnerskiego</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="card timeline-card">
+        <h2 data-i18n="aboutPage.timelineHeading">Roadmapa rozwoju</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <span data-i18n="aboutPage.timelineQ1">Q1 2024</span>
+                <p data-i18n="aboutPage.timelineQ1Desc">Powstaje standard kodów CH oraz pierwsze prototypy kart weryfikacyjnych.</p>
+            </div>
+            <div class="timeline-item">
+                <span data-i18n="aboutPage.timelineQ2">Q2 2024</span>
+                <p data-i18n="aboutPage.timelineQ2Desc">Beta self-service dla twórców i marek, integracje z CMS i builderami.</p>
+            </div>
+            <div class="timeline-item">
+                <span data-i18n="aboutPage.timelineQ3">Q3 2024</span>
+                <p data-i18n="aboutPage.timelineQ3Desc">API do masowego wydawania certyfikatów oraz webhooki do automatycznej weryfikacji.</p>
+            </div>
+            <div class="timeline-item">
+                <span data-i18n="aboutPage.timelineQ4">Q4 2024</span>
+                <p data-i18n="aboutPage.timelineQ4Desc">Obsługa płatności globalnych i partnerstwa z platformami publishingowymi.</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div>
+        <span data-i18n="footer.disclaimer">CertifyHuman przetwarza dane zgodnie z RODO. Pełne zasady znajdziesz poniżej.</span>
+        <a href="rodo.html" data-i18n="footer.rodoLink">RODO / Przetwarzanie danych</a>
+    </div>
+</footer>
+</body>
+</html>

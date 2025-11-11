@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CertifyHuman – Panel admina</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 24px; background: #f5f5f5; color: #111; }
+        h1 { margin-bottom: 12px; }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { padding: 10px 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background: #0f172a; color: #fff; }
+        tr:nth-child(even) { background: #f7fafc; }
+        button { margin-right: 6px; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; }
+        button.approve { background: #16a34a; color: #fff; }
+        button.reject { background: #dc2626; color: #fff; }
+        .note { font-size: 12px; color: #555; margin-top: 4px; }
+    </style>
+</head>
+<body>
+    <h1>CertifyHuman – certyfikaty do weryfikacji</h1>
+    <p>Panel prezentacyjny. Wymaga uruchomionego API i poprawnej konfiguracji CORS.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Kod</th>
+                <th>Tytuł</th>
+                <th>Autor</th>
+                <th>AI usage</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody id="cert-body"></tbody>
+    </table>
+
+    <script>
+        const apiBase = window.location.origin;
+
+        async function loadCertificates() {
+            const res = await fetch(`${apiBase}/api/certificates/all`);
+            const data = await res.json();
+            const awaiting = data.filter(c => c.status === 'awaiting_review');
+            const body = document.getElementById('cert-body');
+            body.innerHTML = awaiting.map(cert => `
+                <tr>
+                    <td>${cert.code}</td>
+                    <td>${cert.title}</td>
+                    <td>${cert.creator}</td>
+                    <td>${cert.aiUsage}</td>
+                    <td>
+                        <button class="approve" onclick="decide('${cert.code}', 'approve')">Zaakceptuj</button>
+                        <button class="reject" onclick="decide('${cert.code}', 'reject')">Odrzuć</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function decide(code, action) {
+            const note = prompt('Notatka (opcjonalnie):', '');
+            await fetch(`${apiBase}/api/certificates/${code}/${action}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ note })
+            });
+            loadCertificates();
+        }
+
+        loadCertificates();
+    </script>
+</body>
+</html>

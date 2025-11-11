@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RODO / GDPR | CertifyHuman</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script defer src="javascript.js"></script>
+</head>
+<body data-page="rodo">
+<header>
+    <div class="nav">
+        <div class="logo">
+            <span class="icon"></span>
+            <span>CERTIFYHUMAN</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html#how" data-i18n="nav.how">Jak to działa</a>
+            <a href="index.html#generate" data-i18n="nav.generate">Wydaj certyfikat</a>
+            <a href="verify.html" class="nav-link-verify" data-i18n="nav.verify">Zweryfikuj kod</a>
+            <a href="about.html" data-i18n="nav.about">O nas</a>
+        </div>
+        <div class="nav-actions">
+            <a class="nav-cta" href="index.html#generate">
+                <span data-i18n="nav.cta">Get certificate</span>
+            </a>
+            <button class="lang-toggle" id="langToggle" type="button" aria-label="Change language">
+                <span class="lang-flag" id="langFlag" aria-hidden="true">🇺🇸</span>
+                <span class="lang-label" id="langLabel">EN</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<main class="rodo-main">
+    <section class="card rodo-hero">
+        <span class="pill" data-i18n="rodo.hero.updated">Aktualizacja: 20.10.2024</span>
+        <h1 data-i18n="rodo.hero.title">RODO / GDPR – jak chronimy Twoje dane</h1>
+        <p data-i18n="rodo.hero.lead">
+            Ten dokument opisuje wszystkie operacje przetwarzania danych osobowych wykonywane w projekcie CertifyHuman,
+            podstawy prawne, środki bezpieczeństwa oraz Twoje prawa jako osoby, której dane dotyczą.
+        </p>
+    </section>
+
+    <section class="card rodo-grid">
+        <div class="rodo-section">
+            <h3 data-i18n="rodo.section.controller.title">Administrator danych</h3>
+            <p data-i18n="rodo.section.controller.body1">Administratorem jest CertifyHuman sp. z o.o., ul. Wirtualna 1, 00-000 Warszawa, NIP 0000000000.</p>
+            <p data-i18n="rodo.section.controller.body2">Kontakt w sprawach danych: privacy@certifyhuman.com lub pisemnie na adres siedziby.</p>
+            <p data-i18n="rodo.section.controller.body3">Przetwarzanie odbywa się na terytorium UE, dane są wersjonowane w centrum danych zlokalizowanym w Irlandii.</p>
+        </div>
+        <div class="rodo-section">
+            <h3 data-i18n="rodo.section.scope.title">Cele i zakres</h3>
+            <ul class="rodo-list">
+                <li data-i18n="rodo.section.scope.list1">Obsługa zamówień certyfikatów, komunikacja e-mailowa oraz rozliczenia.</li>
+                <li data-i18n="rodo.section.scope.list2">Weryfikacja treści i prowadzenie rejestru kodów CH.</li>
+                <li data-i18n="rodo.section.scope.list3">Zabezpieczenie roszczeń i wykrywanie nadużyć związanych z deklaracjami No-AI / AI-Assisted.</li>
+                <li data-i18n="rodo.section.scope.list4">Realizacja obowiązków księgowych i podatkowych wynikających z prawa UE.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="card rodo-grid">
+        <div class="rodo-section">
+            <h3 data-i18n="rodo.section.legal.title">Podstawy prawne</h3>
+            <ul class="rodo-list">
+                <li data-i18n="rodo.section.legal.list1">Art. 6 ust. 1 lit. b RODO – wykonanie umowy o wydanie certyfikatu.</li>
+                <li data-i18n="rodo.section.legal.list2">Art. 6 ust. 1 lit. c RODO – obowiązki wynikające z przepisów rachunkowych i podatkowych.</li>
+                <li data-i18n="rodo.section.legal.list3">Art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes, czyli zapewnienie integralności oznaczeń CertifyHuman.</li>
+                <li data-i18n="rodo.section.legal.list4">Art. 6 ust. 1 lit. a RODO – dobrowolna zgoda na komunikację marketingową (jeśli jej udzielisz).</li>
+            </ul>
+        </div>
+        <div class="rodo-section">
+            <h3 data-i18n="rodo.section.retention.title">Okres przechowywania</h3>
+            <p data-i18n="rodo.section.retention.body1">Dane transakcyjne i certyfikatów przechowujemy przez 72 miesiące od zakończenia umowy (wymogi podatkowe i dochodzeniowe).</p>
+            <p data-i18n="rodo.section.retention.body2">Materiały pomocnicze (załączniki dowodowe) kasujemy po 12 miesiącach od decyzji „approve/reject”, chyba że konieczne jest dłuższe przechowywanie ze względu na spór prawny.</p>
+            <h3 data-i18n="rodo.section.transfer.title">Transfer poza EOG</h3>
+            <p data-i18n="rodo.section.transfer.body">Nie przekazujemy danych poza EOG. Jeśli nastąpi to w przyszłości, wdrożymy Standardowe Klauzule Umowne zgodnie z art. 46 RODO.</p>
+        </div>
+    </section>
+
+    <section class="card rodo-grid">
+        <div class="rodo-section">
+            <h3 data-i18n="rodo.section.recipients.title">Odbiorcy danych</h3>
+            <ul class="rodo-list">
+                <li data-i18n="rodo.section.recipients.list1">Dostawcy płatności (Stripe/Przelewy24) – wyłącznie w zakresie płatności i fakturowania.</li>
+                <li data-i18n="rodo.section.recipients.list2">Dostawcy chmury i hostingu – Microsoft Azure / OVH (umowy powierzenia danych).</li>
+                <li data-i18n="rodo.section.recipients.list3">Audytorzy, kancelarie prawne oraz biuro rachunkowe wspierające naszą działalność.</li>
+                <li data-i18n="rodo.section.recipients.list4">Organom publicznym udostępniamy dane wyłącznie, gdy istnieje ku temu obowiązek prawny.</li>
+            </ul>
+        </div>
+        <div class="rodo-section">
+            <h3 data-i18n="rodo.section.automation.title">Profilowanie i zautomatyzowane decyzje</h3>
+            <p data-i18n="rodo.section.automation.body">Nie prowadzimy zautomatyzowanego podejmowania decyzji ani profilowania, które wywoływałoby skutki prawne wobec użytkowników. Analizy ryzyka i scoring bezpieczeństwa wykonywane są manualnie.</p>
+        </div>
+    </section>
+
+    <section class="card">
+        <h3 data-i18n="rodo.section.rights.title">Prawa osób, których dane dotyczą</h3>
+        <p data-i18n="rodo.section.rights.lead">Możesz skorzystać z poniższych praw wysyłając wiadomość na privacy@certifyhuman.com lub poprzez panel klienta:</p>
+        <ul class="rodo-list">
+            <li data-i18n="rodo.section.rights.list1">Dostęp do danych (art. 15 RODO) – otrzymasz kopię wszystkich przetwarzanych informacji.</li>
+            <li data-i18n="rodo.section.rights.list2">Sprostowanie danych (art. 16 RODO) – poprawimy nieaktualne lub błędne dane.</li>
+            <li data-i18n="rodo.section.rights.list3">Usunięcie danych (art. 17 RODO) – gdy dane nie są już potrzebne lub sprzeciwisz się przetwarzaniu.</li>
+            <li data-i18n="rodo.section.rights.list4">Ograniczenie przetwarzania (art. 18 RODO) – np. na czas rozpatrywania reklamacji.</li>
+            <li data-i18n="rodo.section.rights.list5">Przeniesienie danych (art. 20 RODO) – otrzymasz dane w formacie JSON/CSV.</li>
+            <li data-i18n="rodo.section.rights.list6">Sprzeciw wobec przetwarzania (art. 21 RODO) – w szczególności wobec komunikacji marketingowej.</li>
+            <li data-i18n="rodo.section.rights.list7">Skarga do UODO (lub innego organu nadzorczego w UE), jeśli uznasz, że naruszyliśmy przepisy.</li>
+        </ul>
+    </section>
+
+    <section class="card rodo-grid">
+        <div class="rodo-section">
+            <h3 data-i18n="rodo.section.security.title">Bezpieczeństwo informacji</h3>
+            <ul class="rodo-list">
+                <li data-i18n="rodo.section.security.list1">Szyfrowanie danych w tranzycie (TLS 1.3) oraz w spoczynku (AES-256 w infrastrukturze chmurowej).</li>
+                <li data-i18n="rodo.section.security.list2">Dostęp administracyjny ograniczony do kluczy sprzętowych FIDO2 i logów SIEM przechowywanych 12 miesięcy.</li>
+                <li data-i18n="rodo.section.security.list3">Regularne testy bezpieczeństwa i kopie zapasowe wykonywane codziennie z retencją 30 dni.</li>
+            </ul>
+        </div>
+        <div class="rodo-section">
+            <h3 data-i18n="rodo.section.contact.title">Kontakt i inspektor</h3>
+            <p data-i18n="rodo.section.contact.body1">Wyznaczyliśmy Inspektora Ochrony Danych: IOD – Anna Kowalska, dpo@certifyhuman.com.</p>
+            <p data-i18n="rodo.section.contact.body2">Zgłoszenia naruszeń przyjmujemy całodobowo pod adresem incident@certifyhuman.com. Każde zgłoszenie analizujemy w ciągu 72 godzin.</p>
+            <p data-i18n="rodo.section.contact.body3">Niniejsza polityka wchodzi w życie z dniem 20.10.2024 i będzie aktualizowana przy każdej zmianie procesu przetwarzania.</p>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div>
+        <span data-i18n="footer.disclaimer">CertifyHuman przetwarza dane zgodnie z RODO. Pełne zasady znajdziesz poniżej.</span>
+        <a href="rodo.html" data-i18n="footer.rodoLink">RODO / Przetwarzanie danych</a>
+    </div>
+</footer>
+</body>
+</html>

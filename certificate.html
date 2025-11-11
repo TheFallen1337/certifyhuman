@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Karta certyfikatu | CertifyHuman</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script defer src="javascript.js"></script>
+</head>
+<body data-page="certificate">
+<header>
+    <div class="nav">
+        <div class="logo">
+            <span class="icon"></span>
+            <span>CERTIFYHUMAN</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html#how" data-i18n="nav.how">Jak to działa</a>
+            <a href="index.html#generate" data-i18n="nav.generate">Wydaj certyfikat</a>
+            <a href="verify.html" class="nav-link-verify" data-i18n="nav.verify">Zweryfikuj kod</a>
+            <a href="about.html" data-i18n="nav.about">O nas</a>
+        </div>
+        <div class="nav-actions">
+            <a class="nav-cta" href="index.html#generate">
+                <span data-i18n="nav.cta">Get certificate</span>
+            </a>
+            <button class="lang-toggle" id="langToggle" type="button" aria-label="Change language">
+                <span class="lang-flag" id="langFlag" aria-hidden="true">🇺🇸</span>
+                <span class="lang-label" id="langLabel">EN</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="certificate-card" id="certificateCard" hidden>
+        <div class="certificate-header">
+            <span class="status-label status-valid" id="certificateStatus">Aktywny</span>
+            <h1 id="certificateTitle">Nazwa treści</h1>
+            <div class="code-block" id="certificateCode">CH-XXXXXX-XXXXXX</div>
+            <div class="certificate-meta" id="certificateMeta"></div>
+        </div>
+
+        <div class="certificate-grid">
+            <div class="certificate-block">
+                <h3 data-i18n="certificate.detailsTitle">Opis procesu i deklaracja</h3>
+                <p id="certificateDescription"></p>
+                <ul class="certificate-list" id="certificateInfoList"></ul>
+            </div>
+            <div class="certificate-block">
+                <h3 data-i18n="certificate.attachmentsTitle">Załączniki i dowody</h3>
+                <div id="certificateAttachments"></div>
+            </div>
+        </div>
+
+        <div class="certificate-actions">
+            <button class="btn-secondary" id="copyCodeBtn" type="button" data-i18n="certificate.copy">Skopiuj kod</button>
+            <a class="btn-secondary" href="verify.html" data-i18n="certificate.verifyMore">Zweryfikuj kolejny kod</a>
+            <a class="btn-secondary" href="index.html#generate" data-i18n="certificate.issueMore">Wydaj własny certyfikat</a>
+        </div>
+    </section>
+
+    <section class="certificate-card" id="certificateMissing" hidden></section>
+</main>
+
+<footer class="site-footer">
+    <div>
+        <span data-i18n="footer.disclaimer">CertifyHuman przetwarza dane zgodnie z RODO. Pełne zasady znajdziesz poniżej.</span>
+        <a href="rodo.html" data-i18n="footer.rodoLink">RODO / Przetwarzanie danych</a>
+    </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zweryfikuj kod | CertifyHuman</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script defer src="javascript.js"></script>
+</head>
+<body data-page="verify">
+<header>
+    <div class="nav">
+        <div class="logo">
+            <span class="icon"></span>
+            <span>CERTIFYHUMAN</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html#how" data-i18n="nav.how">Jak to działa</a>
+            <a href="index.html#generate" data-i18n="nav.generate">Wydaj certyfikat</a>
+            <a href="verify.html" class="nav-link-verify" aria-current="page" data-i18n="nav.verify">Zweryfikuj kod</a>
+            <a href="about.html" data-i18n="nav.about">O nas</a>
+        </div>
+        <div class="nav-actions">
+            <a class="nav-cta" href="index.html#generate">
+                <span data-i18n="nav.cta">Get certificate</span>
+            </a>
+            <button class="lang-toggle" id="langToggle" type="button" aria-label="Change language">
+                <span class="lang-flag" id="langFlag" aria-hidden="true">🇺🇸</span>
+                <span class="lang-label" id="langLabel">EN</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="verify-layout">
+        <div class="verify-hero">
+            <span class="pill" data-i18n="verifyHero.pill">Live checker</span>
+            <h1 data-i18n="verifyHero.heading">Zweryfikuj kod certyfikatu</h1>
+            <p class="hero-sub" data-i18n="verifyHero.lead" data-i18n-type="html">
+                Wpisz numer w formacie <strong>CH-XXXXXX-XXXXXX</strong> lub zeskanuj QR otrzymany od twórcy.
+                Wersja demo sprawdza tylko certyfikaty wygenerowane w tej sesji przeglądarki.
+            </p>
+            <div class="verify-points">
+                <p data-i18n="verifyHero.point1">1. Wpisz kod lub wklej numer z QR.</p>
+                <p data-i18n="verifyHero.point2">2. System sprawdzi status „No-AI” vs „AI-Assisted”.</p>
+                <p data-i18n="verifyHero.point3">3. Gdy kod istnieje, automatycznie przejdziesz do pełnej karty certyfikatu.</p>
+            </div>
+            <div class="certificate-actions">
+                <a class="btn-secondary" href="index.html#generate" data-i18n="verifyHero.cta1">Wydaj nowy certyfikat</a>
+                <a class="btn-secondary" href="index.html#how" data-i18n="verifyHero.cta2">Dowiedz się więcej</a>
+            </div>
+        </div>
+        <div class="verify-card">
+            <div class="verify-orbit"></div>
+            <div class="verify-panel">
+                <label for="standaloneCodeInput" data-i18n="verifyHero.inputLabel">Kod certyfikatu</label>
+                <input type="text" id="standaloneCodeInput" placeholder="np. CH-274918-839201" data-i18n-placeholder="verify.placeholder" />
+                <button class="btn-primary" id="standaloneVerifyBtn" type="button">
+                    <span class="icon" aria-hidden="true">🔍</span>
+                    <span data-i18n="verify.buttonFull">Sprawdź certyfikat</span>
+                </button>
+                <div class="verify-feedback" id="standaloneVerifyFeedback"></div>
+            </div>
+        </div>
+</section>
+</main>
+
+<footer class="site-footer">
+    <div>
+        <span data-i18n="footer.disclaimer">CertifyHuman przetwarza dane zgodnie z RODO. Pełne zasady znajdziesz poniżej.</span>
+        <a href="rodo.html" data-i18n="footer.rodoLink">RODO / Przetwarzanie danych</a>
+    </div>
+</footer>
+</body>
+</html>

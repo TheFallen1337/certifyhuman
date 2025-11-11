@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CertifyHuman / Anti-AI Fake Certificate</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script defer src="javascript.js"></script>
+</head>
+<body data-page="home">
+<header>
+    <div class="nav">
+        <div class="logo">
+            <span class="icon"></span>
+            <span>CERTIFYHUMAN</span>
+        </div>
+        <div class="nav-links">
+            <a href="#how" data-i18n="nav.how">Jak to działa</a>
+            <a href="#generate" data-i18n="nav.generate">Wydaj certyfikat</a>
+            <a href="verify.html" class="nav-link-verify" data-i18n="nav.verify">Zweryfikuj kod</a>
+            <a href="about.html" data-i18n="nav.about">O nas</a>
+        </div>
+        <div class="nav-actions">
+            <button class="nav-cta" id="navCta" type="button" data-scroll-target="generate">
+                <span data-i18n="nav.cta">Get certificate</span>
+            </button>
+            <button class="lang-toggle" id="langToggle" type="button" aria-label="Change language">
+                <span class="lang-flag" id="langFlag" aria-hidden="true">🇺🇸</span>
+                <span class="lang-label" id="langLabel">EN</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<main>
+    <!-- HERO -->
+    <section class="hero">
+        <div>
+            <div class="hero-title" data-i18n="hero.title" data-i18n-type="html">
+                Certyfikaty <span class="hero-gradient">autentyczności treści</span><br/>
+                w świecie zdominowanym przez AI.
+            </div>
+            <div class="hero-sub" data-i18n="hero.subtitle">
+                Wyróżnij treści, w których człowiek jest liderem procesu. CertifyHuman nadaje
+                cyfrowe plakietki „No-AI” i „AI-Assisted”, które możesz wkleić na stronę,
+                do portfolio lub posta — wraz z kodem QR prowadzącym do karty weryfikacyjnej.
+            </div>
+            <div class="hero-tags">
+                <div class="tag" data-i18n="hero.tag1"><span class="dot"></span>No-AI Content</div>
+                <div class="tag" data-i18n="hero.tag2"><span class="dot"></span>AI-Assisted, not AI-only</div>
+                <div class="tag" data-i18n="hero.tag3">Brak akceptacji 100% AI</div>
+                <div class="tag" data-i18n="hero.tag4">QR + kod numeryczny</div>
+            </div>
+            <div class="hero-badges">
+                <span data-i18n="hero.badge1">● Twórcy / marki / wydawcy</span>
+                <span data-i18n="hero.badge2">● Jednolity standard oznaczania</span>
+                <span data-i18n="hero.badge3">● Gotowe pod backend & płatności</span>
+            </div>
+        </div>
+        <div class="hero-right">
+            <h2 data-i18n="hero.exampleTitle">Live example: certyfikat treści</h2>
+            <p data-i18n="hero.exampleDescription">Przetestuj pełen flow: zgłoszenie, kod CH-XXXXXX-XXXXXX oraz dedykowana karta ze statusem.</p>
+            <div class="pill" data-i18n="hero.status" data-i18n-type="html">
+                Status:
+                <strong>Early Access</strong>
+                <span>beta ver. – self-service</span>
+            </div>
+            <div class="hero-right-footer">
+                <div>
+                    <div class="mini-label" data-i18n="hero.policy1" data-i18n-type="html">Chronimy odbiorców przed treściami <span>100% generowanymi przez AI</span>.</div>
+                    <div class="mini-label" data-i18n="hero.policy2" data-i18n-type="html">Certyfikujemy tylko: <span>No-AI</span> lub <span>AI-Assisted</span>.</div>
+                </div>
+                <div class="badge-preview">
+                    <span data-i18n="hero.badgeTitle">CERTIFIED CONTENT</span>
+                    <strong data-i18n="hero.badgeStatus">NO-AI / AI-ASSISTED</strong>
+                    <span data-i18n="hero.badgeCta">Scan QR to verify</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how" class="card how-card">
+        <h3 data-i18n="how.heading">Jak to działa?</h3>
+        <p data-i18n="how.lead">Trzymamy się prostego, przejrzystego schematu. Twórca składa deklarację, system wydaje kod CH, a odbiorcy weryfikują go jednym kliknięciem.</p>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">01</div>
+                <div class="step-content">
+                    <strong data-i18n="how.step1.title">Twórca → Formularz + płatność</strong>
+                    <p data-i18n="how.step1.body">Podaje dane treści, wybiera typ certyfikatu (No-AI / AI-Assisted), akceptuje regulamin i opłaca certyfikat.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">02</div>
+                <div class="step-content">
+                    <strong data-i18n="how.step2.title">System → Kod + QR</strong>
+                    <p data-i18n="how.step2.body">Generuje unikalny numer + QR z linkiem do weryfikacji. Twórca może wkleić kod lub QR w dowolne miejsce.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">03</div>
+                <div class="step-content">
+                    <strong data-i18n="how.step3.title">Odbiorca → Weryfikacja</strong>
+                    <p data-i18n="how.step3.body">Wpisuje kod lub skanuje QR i widzi status certyfikatu oraz zadeklarowany poziom użycia AI.</p>
+                </div>
+            </div>
+        </div>
+        <ul class="info-list">
+            <li data-i18n="how.list1">Każdy certyfikat otrzymuje indywidualny numer CH + QR z linkiem do karty weryfikacyjnej.</li>
+            <li data-i18n="how.list2">Oznaczenia „No-AI” oraz „AI-Assisted” są przejrzyste dla odbiorców i partnerów.</li>
+            <li data-i18n="how.list3">Polityka twarda: brak certyfikatów dla treści zadeklarowanych jako 100% AI.</li>
+        </ul>
+    </section>
+
+    <!-- GENERATE -->
+    <section id="generate" class="section-grid">
+        <div class="card">
+            <h3 data-i18n="form.heading">Wydaj certyfikat (beta)</h3>
+            <p data-i18n="form.lead">Uzupełnij brief treści, wybierz deklarację AI i dołącz dowody pracy. W sekundę otrzymasz numer CH oraz QR do publikacji.</p>
+
+            <form id="certificateForm">
+                <div>
+                    <label for="contentTitle" data-i18n="form.titleLabel">Nazwa / tytuł treści</label>
+                    <input type="text" id="contentTitle" placeholder="np. Artykuł: 'Dlaczego AI nie zastąpi ludzi?'" data-i18n-placeholder="form.titlePlaceholder" required />
+                </div>
+                <div>
+                    <label for="creatorName" data-i18n="form.creatorLabel">Autor / marka</label>
+                    <input type="text" id="creatorName" placeholder="Twoje imię / nazwa marki" data-i18n-placeholder="form.creatorPlaceholder" required />
+                </div>
+                <div>
+                    <label for="creatorEmail" data-i18n="form.emailLabel">E-mail (wyślemy tam potwierdzenie)</label>
+                    <input type="email" id="creatorEmail" placeholder="kontakt@twojamarka.com" data-i18n-placeholder="form.emailPlaceholder" required />
+                </div>
+                <div>
+                    <label for="contentType" data-i18n="form.typeLabel">Typ treści</label>
+                    <select id="contentType" required>
+                        <option value="" data-i18n="form.typeDefault">Wybierz...</option>
+                        <option value="article" data-i18n="form.typeArticle">Artykuł / tekst</option>
+                        <option value="video" data-i18n="form.typeVideo">Wideo / content social</option>
+                        <option value="image" data-i18n="form.typeImage">Grafika / zdjęcie</option>
+                        <option value="audio" data-i18n="form.typeAudio">Audio / podcast / muzyka</option>
+                        <option value="other" data-i18n="form.typeOther">Inne</option>
+                    </select>
+                </div>
+                <div>
+                    <span class="label" data-i18n="form.aiLabel">Deklaracja użycia AI</span>
+                    <div class="inline-options">
+                        <label>
+                            <input type="radio" name="aiUsage" value="no-ai" required />
+                            <span data-i18n="form.aiNoAi">100% bez AI (No-AI)</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="aiUsage" value="ai-assisted" />
+                            <span data-i18n="form.aiAssisted">Z pomocą AI (AI-Assisted)</span>
+                        </label>
+                        <label style="opacity:0.35; pointer-events:none;">
+                            <input type="radio" disabled />
+                            <span data-i18n="form.aiDisabled">100% AI (nieobsługiwane)</span>
+                        </label>
+                    </div>
+                    <div class="hint" data-i18n="form.aiHint">
+                        Akceptujemy tylko treści, gdzie <strong>człowiek jest głównym autorem</strong>.
+                        Wersja 100% AI nie otrzyma certyfikatu.
+                    </div>
+                </div>
+                <div>
+                    <label for="contentDescription" data-i18n="form.processLabel">Proces tworzenia (opis dla certyfikatora)</label>
+                    <textarea id="contentDescription" placeholder="Opisz, jak powstawała treść: narzędzia, etapy, udział ludzi vs AI. To pole pomaga w samo-weryfikacji." data-i18n-placeholder="form.processPlaceholder"></textarea>
+                </div>
+
+                <div>
+                    <label for="evidenceFiles" data-i18n="form.attachmentsLabel">Załączniki (dowody pracy własnej, maks. 5 plików)</label>
+                    <input type="file" id="evidenceFiles" multiple accept="image/*,.pdf,.doc,.docx,.txt,.zip" />
+                    <div class="hint" data-i18n="form.attachmentsHint">
+                        Dołącz szkice, screeny z procesu lub inne dowody pracy własnej. W tej wersji beta pliki pozostają wyłącznie w Twojej przeglądarce.
+                    </div>
+                    <ul id="evidenceList" class="evidence-list"></ul>
+                </div>
+
+                <div>
+                    <span class="label" data-i18n="form.paymentLabel">Płatność i aktywacja</span>
+                    <div class="hint" data-i18n="form.paymentHint">
+                        Kliknięcie przycisku uruchamia przykładowy checkout i natychmiast aktywuje certyfikat w tej wersji prezentacyjnej.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    <span class="icon" aria-hidden="true">⚡</span>
+                    <span data-i18n="form.submit">Wygeneruj certyfikat + kod + QR</span>
+                </button>
+            </form>
+
+            <div id="codeResult" class="code-result" aria-live="polite">
+                <div>
+                    <div class="code-block">
+                        <span data-i18n="code.label">Kod certyfikatu:</span>
+                        <strong id="generatedCode">CH-XXXX-XXXX</strong>
+                    </div>
+                    <div class="code-meta" id="codeMeta"></div>
+                    <div class="code-meta" data-i18n="code.instructions">
+                        Możesz wkleić ten kod w opis treści lub osadzić poniższy QR.
+                        Odbiorca po wejściu na stronę i wpisaniu kodu (lub skanie QR)
+                        zweryfikuje status certyfikatu.
+                    </div>
+                    <div id="attachmentPreview" class="attachment-preview"></div>
+                </div>
+                <div class="qr-wrapper" aria-hidden="true">
+                    <div id="qrcode"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VERIFY -->
+        <div id="verify" class="card">
+            <h3 data-i18n="verify.heading">Zweryfikuj kod certyfikatu</h3>
+            <p data-i18n="verify.lead">
+                Masz numer CH lub zeskanowałeś QR? Wpisz go poniżej i zobacz status treści wraz z deklaracją użycia AI.
+            </p>
+
+            <div class="verify-input-row">
+                <input type="text" id="verifyCodeInput" placeholder="np. CH-274918-839201" data-i18n-placeholder="verify.placeholder" />
+                <button class="btn-ghost" id="verifyButton" type="button">
+                    <span data-i18n="verify.button">Sprawdź</span>
+                </button>
+            </div>
+            <div class="hint" data-i18n="verify.hint">
+                Prywatna beta: weryfikacja obejmuje kody zapisane w tej przeglądarce. W finalnej wersji każdy kod będzie sprawdzany 24/7 w chmurze.
+            </div>
+
+            <div id="verifyResult" class="verify-result" aria-live="polite"></div>
+        </div>
+    </section>
+
+    <section id="about" class="card about-card">
+        <div class="about-grid">
+            <div>
+                <span class="pill" data-i18n="about.pill">O nas</span>
+                <h3 data-i18n="about.heading">Budujemy zaufanie do treści tworzonych przez ludzi</h3>
+                <p data-i18n="about.lead">
+                    CertifyHuman to inicjatywa twórców, strategów i product designerów, którzy chcą utrzymać przejrzystość
+                    w epoce generatywnego AI. Dostarczamy prosty standard oznaczania „No-AI” i „AI-Assisted”.
+                </p>
+                <ul class="info-list">
+                    <li data-i18n="about.point1">Jednolity system kodów CH i kart weryfikacyjnych.</li>
+                    <li data-i18n="about.point2">Gotowe komponenty do integracji z Twoją stroną lub CMS.</li>
+                    <li data-i18n="about.point3">Roadmapa obejmuje API, płatności i webhooki weryfikacyjne.</li>
+                </ul>
+            </div>
+            <div class="about-highlight">
+                <h4 data-i18n="about.statsTitle">Dlaczego to robimy?</h4>
+                <p data-i18n="about.statsBody">
+                    Internet potrzebuje prostego sposobu na udowodnienie, że za treścią stoi człowiek. Dzięki CertifyHuman odbiorcy widzą,
+                    kto deklaruje swoją pracę i w jaki sposób korzysta z AI.
+                </p>
+                <div class="about-metrics">
+                    <div>
+                        <strong>3</strong>
+                        <span data-i18n="about.metric1">tryby oznaczeń</span>
+                    </div>
+                    <div>
+                        <strong>24/7</strong>
+                        <span data-i18n="about.metric2">weryfikacja kodów</span>
+                    </div>
+                    <div>
+                        <strong>∞</strong>
+                        <span data-i18n="about.metric3">formatów treści</span>
+                    </div>
+                </div>
+                <a class="btn-secondary" href="about.html" data-i18n="about.cta">Poznaj pełną historię</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div>
+        <span data-i18n="footer.disclaimer">CertifyHuman przetwarza dane zgodnie z RODO. Pełne zasady znajdziesz poniżej.</span>
+        <a href="rodo.html" data-i18n="footer.rodoLink">RODO / Przetwarzanie danych</a>
+    </div>
+</footer>
+</body>
+</html>
