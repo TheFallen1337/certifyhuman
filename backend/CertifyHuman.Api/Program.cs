@@ -6,6 +6,7 @@ using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using Microsoft.OpenApi.Models;
 
 Env.Load();
 
@@ -33,14 +34,37 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddSingleton(new StripeSettings { SecretKey = stripeSecret ?? string.Empty });
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "CertifyHuman API",
+        Version = "v1",
+        Description = "Endpoints for managing CertifyHuman certificates"
+    });
+});
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
 app.UseExceptionHandler("/error");
-app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwagger(options =>
+{
+    options.RouteTemplate = "swagger/{documentName}/swagger.json";
+});
+
+app.UseSwaggerUI(options =>
+{
+    var externalBaseUrl = Environment.GetEnvironmentVariable("RENDER_EXTERNAL_URL");
+    var swaggerJsonPath = "/swagger/v1/swagger.json";
+    var swaggerEndpoint = string.IsNullOrWhiteSpace(externalBaseUrl)
+        ? swaggerJsonPath
+        : $"{externalBaseUrl.TrimEnd('/')}{swaggerJsonPath}";
+
+    options.SwaggerEndpoint(swaggerEndpoint, "CertifyHuman API v1");
+    options.RoutePrefix = "swagger";
+    options.DocumentTitle = "CertifyHuman API Docs";
+});
 app.UseStaticFiles();
 app.UseCors("frontend");
 app.UseHttpsRedirection();

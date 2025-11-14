@@ -171,8 +171,16 @@ main {
 
 .hero-gradient {
     background: linear-gradient(to right, var(--accent), var(--accent-alt));
-    -webkit-background-clip: text;
-    color: transparent;
+    color: var(--accent); /* fallback for browsers without text clipping */
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    .hero-gradient {
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+    }
 }
 
 .hero-sub {
