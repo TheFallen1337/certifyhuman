@@ -6,7 +6,6 @@ using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using System.IO;
-using Microsoft.OpenApi.Models;
 
 Env.Load();
 
@@ -34,15 +33,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddSingleton(new StripeSettings { SecretKey = stripeSecret ?? string.Empty });
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "CertifyHuman API",
-        Version = "v1",
-        Description = "Endpoints for managing CertifyHuman certificates"
-    });
-});
+builder.Services.AddSwaggerGen(); // Previous duplicate Swagger registrations removed to avoid Render issues.
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
@@ -50,11 +41,13 @@ var app = builder.Build();
 app.UseExceptionHandler("/error");
 app.UseSwagger(c =>
 {
+    // Ensures swagger.json stays under a single predictable path; fixes earlier conflicting RouteTemplate values.
     c.RouteTemplate = "swagger/{documentName}/swagger.json";
 });
 
 app.UseSwaggerUI(c =>
 {
+    // Single endpoint + RoutePrefix keep Swagger UI working on both localhost and Render.
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "CertifyHuman API v1");
     c.RoutePrefix = "swagger";
 });
