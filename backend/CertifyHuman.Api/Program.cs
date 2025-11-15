@@ -33,24 +33,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddSingleton(new StripeSettings { SecretKey = stripeSecret ?? string.Empty });
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(); // Previous duplicate Swagger registrations removed to avoid Render issues.
+builder.Services.AddSwaggerGen();
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
 app.UseExceptionHandler("/error");
-app.UseSwagger(c =>
-{
-    // Ensures swagger.json stays under a single predictable path; fixes earlier conflicting RouteTemplate values.
-    c.RouteTemplate = "swagger/{documentName}/swagger.json";
-});
-
-app.UseSwaggerUI(c =>
-{
-    // Single endpoint + RoutePrefix keep Swagger UI working on both localhost and Render.
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "CertifyHuman API v1");
-    c.RoutePrefix = "swagger";
-});
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseStaticFiles();
 app.UseCors("frontend");
 app.UseHttpsRedirection();
