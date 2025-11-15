@@ -16,7 +16,7 @@ var stripeSecret = ResolveStripeSecret(builder.Configuration);
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("frontend", policy =>
+    options.AddPolicy("frontend", policy => 
         policy
             .WithOrigins(
                 "http://localhost:5500",
@@ -56,8 +56,7 @@ app.UseHttpsRedirection();
 app.MapGet("/", () => Results.Redirect("/admin/index.html"));
 app.MapGet("/admin", () => Results.Redirect("/admin/index.html"));
 app.Map("/error", (HttpContext http) => Results.Problem(detail: "An unexpected error occurred."));
-// Handle CORS preflight for API routes only so Swagger static assets still serve via GET.
-app.MapMethods("/api/{*path}", new[] { "OPTIONS" }, () => Results.Ok());
+app.MapMethods("{*path}", new[] { "OPTIONS" }, () => Results.Ok());
 
 app.MapPost("/api/certificates/new", async (CertificateRequest request, AppDbContext context) =>
 {
