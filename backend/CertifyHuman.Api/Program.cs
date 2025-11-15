@@ -39,8 +39,16 @@ builder.Services.AddProblemDetails();
 var app = builder.Build();
 
 app.UseExceptionHandler("/error");
-app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwagger(c =>
+{
+    c.RouteTemplate = "swagger/{documentName}/swagger.json";
+});
+
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "CertifyHuman API v1");
+    c.RoutePrefix = "swagger";
+});
 app.UseStaticFiles();
 app.UseCors("frontend");
 app.UseHttpsRedirection();
