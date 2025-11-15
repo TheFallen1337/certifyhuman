@@ -48,22 +48,15 @@ builder.Services.AddProblemDetails();
 var app = builder.Build();
 
 app.UseExceptionHandler("/error");
-app.UseSwagger(options =>
+app.UseSwagger(c =>
 {
-    options.RouteTemplate = "swagger/{documentName}/swagger.json";
+    c.RouteTemplate = "swagger/{documentName}/swagger.json";
 });
 
-app.UseSwaggerUI(options =>
+app.UseSwaggerUI(c =>
 {
-    var externalBaseUrl = Environment.GetEnvironmentVariable("RENDER_EXTERNAL_URL");
-    var swaggerJsonPath = "/swagger/v1/swagger.json";
-    var swaggerEndpoint = string.IsNullOrWhiteSpace(externalBaseUrl)
-        ? swaggerJsonPath
-        : $"{externalBaseUrl.TrimEnd('/')}{swaggerJsonPath}";
-
-    options.SwaggerEndpoint(swaggerEndpoint, "CertifyHuman API v1");
-    options.RoutePrefix = "swagger";
-    options.DocumentTitle = "CertifyHuman API Docs";
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "CertifyHuman API v1");
+    c.RoutePrefix = "swagger";
 });
 app.UseStaticFiles();
 app.UseCors("frontend");
