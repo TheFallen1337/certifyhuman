@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CertifyHuman.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5eec02784df77b2bb2743f4099915459e00f405b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9b191ee858264bac0fdc41789b0d316dfcf2e5b8")]
 [assembly: System.Reflection.AssemblyProductAttribute("CertifyHuman.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CertifyHuman.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
