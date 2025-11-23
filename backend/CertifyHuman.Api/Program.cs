@@ -56,7 +56,7 @@ app.UseHttpsRedirection();
 app.MapGet("/", () => Results.Redirect("/admin/index.html"));
 app.MapGet("/admin", () => Results.Redirect("/admin/index.html"));
 app.Map("/error", (HttpContext http) => Results.Problem(detail: "An unexpected error occurred."));
-app.MapMethods("{*path}", new[] { "OPTIONS" }, () => Results.Ok());
+app.MapMethods("/api/{*path}", new[] { "OPTIONS" }, () => Results.Ok()); // Keep preflight limited to API routes so Swagger assets can load via GET.
 
 app.MapPost("/api/certificates/new", async (CertificateRequest request, AppDbContext context) =>
 {
