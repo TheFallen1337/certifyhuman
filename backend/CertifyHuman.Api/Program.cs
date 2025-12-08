@@ -18,6 +18,10 @@ Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
+// Configure port for Render
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://*:{port}");
+
 var stripeSecret = ResolveStripeSecret(builder.Configuration);
 
 builder.Services.AddCors(options =>
