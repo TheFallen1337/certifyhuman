@@ -34,9 +34,15 @@ builder.Services.AddCors(options =>
             .AllowCredentials());
 });
 
-var dbPath = Path.Combine(AppContext.BaseDirectory, "certifyhuman.db");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(connectionString))
+{
+    var dbPath = Path.Combine(AppContext.BaseDirectory, "certifyhuman.db");
+    connectionString = $"Data Source={dbPath}";
+}
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite($"Data Source={dbPath}"));
+    options.UseSqlite(connectionString));
 
 builder.Services.AddSingleton(new StripeSettings { SecretKey = stripeSecret ?? string.Empty });
 builder.Services.AddHttpClient<AiOrNotService>();
@@ -327,13 +333,21 @@ public static class TextExtractor
 public class AiOrNotService
 {
     private readonly HttpClient _httpClient;
-    private const string ApiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjRhNDI1NGMxLTEzYmYtNDYzYy1hYmJlLTcwMDUyMTgzOWM2OCIsInVzZXJfaWQiOiI1OWU4MDY2OS1hN2UyLTQ3MTMtOGRkMy03ZDRmNmM1MDgyNjciLCJhdWQiOiJhY2Nlc3MiLCJleHAiOjE5MjI5MTg0MDAsInNjb3BlIjoiYWxsIn0.vV7IYEpcjUcwqk7orpCgMqaCVeIOMF5EBffXAOaRqLE";
-
-    public AiOrNotService(HttpClient httpClient)
+    public AiOrNotService(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
         _httpClient.BaseAddress = new Uri("https://api.aiornot.com/");
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ApiKey);
+        
+        var apiKey = configuration["AI_OR_NOT_API_KEY"] ?? configuration["AiOrNot:ApiKey"];
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            // Fallback for development if needed, or throw/log warning
+            // Keeping the old key as fallback ONLY for local dev convenience if not set, 
+            // but ideally this should come from env.
+            apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjRhNDI1NGMxLTEzYmYtNDYzYy1hYmJlLTcwMDUyMTgzOWM2OCIsInVzZXJfaWQiOiI1OWU4MDY2OS1hN2UyLTQ3MTMtOGRkMy03ZDRmNmM1MDgyNjciLCJhdWQiOiJhY2Nlc3MiLCJleHAiOjE5MjI5MTg0MDAsInNjb3BlIjoiYWxsIn0.vV7IYEpcjUcwqk7orpCgMqaCVeIOMF5EBffXAOaRqLE";
+        }
+
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
     }
 
     public async Task<string?> AnalyzeImageAsync(string base64Image)
