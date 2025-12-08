@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CertifyHuman - Admin Panel</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .admin-container {
+            display: none;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            text-align: center;
+        }
+
+        .cert-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 12px;
+        }
+
+        .cert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .cert-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-approve {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-reject {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-top: 0.5rem;
+        }
+
+        .qr-preview {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="loginView" class="login-container">
+        <h2>Admin Login</h2>
+        <input type="password" id="apiKey" placeholder="Enter Admin Key"
+            style="padding: 0.5rem; width: 100%; margin-bottom: 1rem; background: #222; border: 1px solid #444; color: white;">
+        <button onclick="login()" class="btn-primary">Login</button>
+    </div>
+
+    <div id="adminView" class="admin-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>Admin Panel</h1>
+            <button onclick="logout()"
+                style="background: transparent; border: 1px solid #666; color: #aaa; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;">Logout</button>
+        </div>
+
+        <h2 style="border-bottom: 1px solid #333; padding-bottom: 0.5rem; margin-bottom: 1rem;">Awaiting Review</h2>
+        <div id="certList">Loading...</div>
+
+        <h2 style="border-bottom: 1px solid #333; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 3rem;">
+            History</h2>
+        <div id="historyList">Loading...</div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+            ? "http://localhost:5197"
+            : window.location.origin;
+
+        function login() {
+            const key = document.getElementById('apiKey').value;
+            if (key) {
+                localStorage.setItem('adminKey', key);
+                showAdmin();
+                loadCertificates();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('adminKey');
+            location.reload();
+        }
+
+        function showAdmin() {
+            document.getElementById('loginView').style.display = 'none';
+            document.getElementById('adminView').style.display = 'block';
+        }
+
+        async function loadCertificates() {
+            const key = localStorage.getItem('adminKey');
+            try {
+                const res = await fetch(`${API_BASE}/api/certificates/all`, {
+                    headers: { 'X-Admin-Key': key }
+                });
+
+                if (res.status === 401) {
+                    alert("Invalid Key");
+                    logout();
+                    return;
+                }
+
+                const data = await res.json();
+
+                const pending = data.filter(c => c.status === 'awaiting_review' || c.status === 'pending_payment');
+                const history = data.filter(c => c.status !== 'awaiting_review' && c.status !== 'pending_payment');
+
+                renderList(pending, 'certList', true);
+                renderList(history, 'historyList', false);
+            } catch (e) {
+                console.error(e);
+                document.getElementById('certList').innerText = "Error loading certificates.";
+            }
+        }
+
+        function renderList(certs, containerId, isActionable) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            if (certs.length === 0) {
+                container.innerHTML = '<p style="color: #666; font-style: italic;">No certificates in this section.</p>';
+                return;
+            }
+
+            certs.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'cert-card';
+
+                let actionsHtml = '';
+                let noteHtml = '';
+
+                if (isActionable) {
+                    noteHtml = `
+                        <div>
+                            <label>Admin Comment (Public):</label>
+                            <textarea id="note-${c.code}" rows="2" placeholder="e.g. Verified by Admin"></textarea>
+                        </div>`;
+                    actionsHtml = `
+                        <div class="cert-actions">
+                            <button type="button" class="btn-approve" onclick="decide('${c.code}', 'approve')">Approve</button>
+                            <button type="button" class="btn-reject" onclick="decide('${c.code}', 'reject')">Reject</button>
+                        </div>`;
+                } else {
+                    // History view
+                    if (c.adminComment) {
+                        noteHtml = `<p><strong>Admin Comment:</strong> <em style="color: #aaa">${c.adminComment}</em></p>`;
+                    }
+                }
+
+                div.innerHTML = `
+                    <div class="cert-header">
+                        <h3>${c.title} <small style="color: #888">(${c.code})</small></h3>
+                        <span style="background: #333; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem">${c.status}</span>
+                    </div>
+                    <div style="display:flex; gap: 20px;">
+                        <div style="flex:1">
+                            <p><strong>Creator:</strong> ${c.creator} (${c.email})</p>
+                            <p><strong>Type:</strong> ${c.type}</p>
+                            <p><strong>AI Usage:</strong> ${c.aiUsage}</p>
+                            <p><strong>Description:</strong> ${c.description || '-'}</p>
+                            <p><strong>Attachments:</strong> ${c.attachments.length > 0 ? c.attachments.join(', ') : 'None'}</p>
+                            ${c.aiAnalysisResult ? `<p style="margin-top: 10px; padding: 10px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 6px;"><strong>🤖 AI Analysis:</strong> ${c.aiAnalysisResult}</p>` : ''}
+                        </div>
+                        <div style="text-align: center;">
+                            <div id="qr-${c.code}" class="qr-preview"></div>
+                            <div style="font-size: 0.8rem; color: #888; margin-top: 5px;">QR for Verification</div>
+                        </div>
+                    </div>
+                    
+                    ${noteHtml}
+                    ${actionsHtml}
+                `;
+                container.appendChild(div);
+
+                // Generate QR
+                setTimeout(() => {
+                    const qrContainer = document.getElementById(`qr-${c.code}`);
+                    if (qrContainer) {
+                        const url = `${window.location.origin}/certificate.html?code=${c.code}`;
+                        new QRCode(qrContainer, {
+                            text: url,
+                            width: 100,
+                            height: 100
+                        });
+                    }
+                }, 0);
+            });
+        }
+
+        async function decide(code, action) {
+            const key = localStorage.getItem('adminKey');
+            const note = document.getElementById(`note-${code}`).value;
+
+            if (!confirm(`Are you sure you want to ${action} this certificate?`)) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/certificates/${code}/${action}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Key': key
+                    },
+                    body: JSON.stringify({ note })
+                });
+
+                if (res.ok) {
+                    alert(`Certificate ${action}d!`);
+                    loadCertificates();
+                } else {
+                    alert("Error processing request");
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Network error");
+            }
+        }
+
+        // Auto-login check
+        if (localStorage.getItem('adminKey')) {
+            showAdmin();
+            loadCertificates();
+        }
+    </script>
+</body>
+
+</html>

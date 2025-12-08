@@ -437,7 +437,9 @@ const storageKey = "certifyHumanCertificates";
 const MAX_ATTACHMENTS = 5;
 const MAX_IMAGE_PREVIEW_SIZE = 3 * 1024 * 1024;
 const issuedCertificates = new Map();
-const API_BASE_URL = "https://certifyhuman.onrender.com";
+const API_BASE_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+    ? "http://localhost:5197"
+    : window.location.origin;
 
 const form = document.getElementById("certificateForm");
 const codeResult = document.getElementById("codeResult");
@@ -708,7 +710,8 @@ function formatCertificateForUi(payload = {}, defaults = {}) {
         issuedAt: payload.createdAt ?? defaults.issuedAt ?? new Date().toISOString(),
         status: payload.status ?? defaults.status ?? "",
         paymentLink: payload.paymentLink ?? defaults.paymentLink,
-        paymentId: payload.paymentId ?? defaults.paymentId
+        paymentId: payload.paymentId ?? defaults.paymentId,
+        adminComment: payload.adminComment ?? defaults.adminComment ?? ""
     };
 }
 
@@ -795,6 +798,15 @@ async function handleCertificateSubmit(event) {
         return;
     }
 
+    // Get attachments names
+    const fileInput = document.getElementById("evidenceFiles");
+    const attachmentNames = [];
+    if (fileInput && fileInput.files.length > 0) {
+        for (let i = 0; i < fileInput.files.length; i++) {
+            attachmentNames.push(fileInput.files[i].name);
+        }
+    }
+
     const data = {
         title,
         creator,
@@ -802,20 +814,293 @@ async function handleCertificateSubmit(event) {
         type,
         description: desc,
         aiUsage,
-        attachments: []
+        attachments: attachmentNames
     };
 
-    const certificate = await createCertificate(data);
-    if (!certificate) {
+    // AI Analysis Data Preparation
+    if (type === 'article') {
+        data.contentText = desc;
+
+        // Also check for attachment to extract text from
+        const fileInput = document.getElementById("evidenceFiles");
+        if (fileInput && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            try {
+                data.attachmentBase64 = await toBase64(file);
+                data.attachmentFileName = file.name;
+            } catch (e) {
+                console.error("Failed to convert attachment", e);
+            }
+        }
+
+    } else if (type === 'image') {
+        // Get the first file and convert to base64
+        const fileInput = document.getElementById("evidenceFiles");
+        if (fileInput && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            try {
+                data.imageBase64 = await toBase64(file);
+            } catch (e) {
+                console.error("Failed to convert image", e);
+            }
+        }
+    }
+
+    // Simulate creation
+    const created = await createCertificate(data);
+    if (!created) return;
+
+    lastGeneratedCertificate = created;
+    persistCertificates();
+
+    // Show Payment Modal instead of direct result
+    const paymentModal = document.getElementById('paymentModal');
+    const paymentLinkBtn = document.getElementById('paymentLinkBtn');
+
+    if (paymentModal && paymentLinkBtn) {
+        paymentLinkBtn.href = created.paymentLink || "#";
+        paymentModal.setAttribute('aria-hidden', 'false');
+    }
+}
+
+function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.setAttribute('aria-hidden', 'true');
+}
+
+function simulatePaymentSuccess() {
+    closeModal('paymentModal');
+
+    // Simulate updating status to awaiting_review (in real app this happens via webhook)
+    if (lastGeneratedCertificate) {
+        lastGeneratedCertificate.status = 'awaiting_review';
+        // Update in storage
+        issuedCertificates.set(lastGeneratedCertificate.code, lastGeneratedCertificate);
+        persistCertificates();
+    }
+
+    const successModal = document.getElementById('successModal');
+    const successCode = document.getElementById('successCode');
+    if (successModal && successCode) {
+        successCode.textContent = lastGeneratedCertificate?.code || "CH-????";
+        successModal.setAttribute('aria-hidden', 'false');
+    }
+}
+
+function generateCertificateCode() {
+    const part1 = Math.floor(100000 + Math.random() * 900000);
+    const part2 = Math.floor(100000 + Math.random() * 900000);
+    return `CH-${part1}-${part2}`;
+}
+
+function displayCertificate(certificate, isRefresh = false) {
+    if (!generatedCodeEl || !codeMetaEl || !codeResult) return;
+    if (!isRefresh) {
+        lastGeneratedCertificate = certificate;
+    }
+
+    generatedCodeEl.textContent = certificate.code;
+
+    const lines = [
+        `${certificate.title} — ${certificate.creator}`,
+        `${getContentTypeLabel(certificate.type)} • ${getAiUsageLabel(certificate.aiUsage)}`,
+        certificate.desc ? certificate.desc : "",
+        formatMessage("code.attachmentsCount", { count: (certificate.attachments || []).length }),
+        formatMessage("verify.issuedOn", { date: formatDate(certificate.issuedAt) })
+    ].filter(Boolean);
+
+    codeMetaEl.textContent = lines.join("\n");
+    codeResult.classList.add("visible");
+}
+
+function renderQr(code) {
+    if (!qrContainer || typeof QRCode === "undefined") return;
+    qrContainer.innerHTML = "";
+
+    const url = new URL(window.location.href);
+    const currentPath = url.pathname;
+    const newPath = currentPath.replace(/[^/]+$/, "certificate.html");
+    url.pathname = newPath;
+    url.search = "";
+    url.hash = "";
+    url.searchParams.set("code", code);
+
+    new QRCode(qrContainer, {
+        text: url.toString(),
+        width: 110,
+        height: 110,
+        colorDark: "#38bdf8",
+        colorLight: "#020817",
+        correctLevel: QRCode.CorrectLevel.H
+    });
+}
+
+async function runVerification() {
+    if (!verifyInput || !verifyResult) return;
+    const raw = verifyInput.value.trim();
+
+    if (!raw) {
+        verifyResult.innerHTML = "";
         return;
     }
 
-    displayCertificate(certificate);
-    renderQr(certificate.code);
-    form?.reset();
-    renderAttachmentPreview([]);
+    const { normalized, certificate } = await verifyCertificate(raw);
+
+    verifyResult.innerHTML = buildVerificationMessage(normalized, certificate);
 }
 
+async function handleStandaloneVerification() {
+    if (!standaloneInput || !standaloneFeedback) return;
+
+    const raw = standaloneInput.value.trim();
+    if (!raw) {
+        lastStandaloneResult = { code: "", certificate: null, valid: false };
+        renderStandaloneFeedback("", null, false);
+        return;
+    }
+
+    toggleOrbit(true);
+    const { normalized, certificate } = await verifyCertificate(raw);
+
+
+    lastStandaloneResult = {
+        code: normalized,
+        certificate,
+        valid: Boolean(normalized && certificate)
+    };
+
+    if (!normalized || !certificate) {
+        renderStandaloneFeedback(normalized, certificate, false);
+        toggleOrbit(false);
+        return;
+    }
+
+    renderStandaloneFeedback(normalized, certificate, true);
+
+    setTimeout(() => {
+        window.location.href = getCertificateDetailUrl(normalized);
+    }, 900);
+}
+
+function renderCertificateDetails(cert) {
+    if (!cert) return;
+
+    currentDetailCertificate = cert;
+
+    // Basic info
+    if (certificateTitleEl) certificateTitleEl.textContent = cert.title;
+    if (certificateCodeEl) certificateCodeEl.textContent = cert.code;
+
+    if (certificateMetaEl) {
+        const dateStr = new Date(cert.issuedAt).toLocaleDateString(currentLang);
+        certificateMetaEl.innerHTML = `
+            <span>${cert.creator}</span>
+            <span class="dot">•</span>
+            <span>${dateStr}</span>
+        `;
+    }
+
+    if (certificateDescEl) {
+        if (cert.description) {
+            certificateDescEl.textContent = cert.description;
+            certificateDescEl.style.fontStyle = "normal";
+            certificateDescEl.style.opacity = "1";
+        } else {
+            certificateDescEl.textContent = t("certificate.noDescription");
+            certificateDescEl.style.fontStyle = "italic";
+            certificateDescEl.style.opacity = "0.6";
+        }
+    }
+
+    // Status badge
+    if (certificateStatusEl) {
+        const isNoAi = cert.aiUsage === "no-ai";
+        const badgeClass = isNoAi ? "status-valid" : "status-valid"; // Both are valid now
+        const icon = isNoAi ? "✨" : "🤖";
+        certificateStatusEl.className = `status-label ${badgeClass}`;
+        certificateStatusEl.innerHTML = `${icon} ${getStatusBadgeLabel(cert.aiUsage)}`;
+    }
+
+    // Info list
+    if (certificateInfoListEl) {
+        certificateInfoListEl.innerHTML = `
+            <li>
+                <span>${t("certificate.info.author")}</span>
+                <strong>${cert.creator}</strong>
+            </li>
+            <li>
+                <span>${t("certificate.info.type")}</span>
+                <strong>${getContentTypeLabel(cert.type)}</strong>
+            </li>
+            <li>
+                <span>${t("certificate.info.aiUsage")}</span>
+                <strong>${getAiUsageLabel(cert.aiUsage)}</strong>
+            </li>
+        `;
+    }
+
+    // Attachments - HIDDEN as requested
+    if (certificateAttachmentsEl) {
+        certificateAttachmentsEl.style.display = 'none';
+    }
+
+    // Admin Comment - NEW
+    // Check if we already have the container, if not create it
+    let adminSection = document.getElementById('adminCommentSection');
+    if (!adminSection) {
+        adminSection = document.createElement('div');
+        adminSection.id = 'adminCommentSection';
+        adminSection.className = 'admin-comment-section';
+        // Insert after description
+        if (certificateDescEl && certificateDescEl.parentNode) {
+            certificateDescEl.parentNode.insertBefore(adminSection, certificateDescEl.nextSibling);
+        }
+    }
+
+    // Only show if there is a comment (decisionNote/adminComment)
+    // Note: The API returns 'decisionNote' mapped to 'adminComment' in DTO, or we need to check how we mapped it.
+    // In Program.cs ToResponse we mapped c.DecisionNote to the last parameter.
+    // In javascript.js formatCertificateForUi we need to make sure we capture it.
+    // Let's assume formatCertificateForUi captures it as 'adminComment' or we need to update that function too.
+    // Wait, I need to update formatCertificateForUi first!
+
+    // I will update formatCertificateForUi in a separate edit or include it here if I can find it.
+    // It's defined earlier in the file. I'll stick to renderCertificateDetails here and assume I'll fix formatCertificateForUi next.
+
+    if (cert.adminComment) {
+        adminSection.style.display = 'block';
+        adminSection.innerHTML = `
+            <h4>Opis Administracji</h4>
+            <p>${cert.adminComment}</p>
+        `;
+    } else {
+        adminSection.style.display = 'none';
+    }
+}
+
+function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.setAttribute('aria-hidden', 'true');
+}
+
+function simulatePaymentSuccess() {
+    closeModal('paymentModal');
+
+    // Simulate updating status to awaiting_review (in real app this happens via webhook)
+    if (lastGeneratedCertificate) {
+        lastGeneratedCertificate.status = 'awaiting_review';
+        // Update in storage
+        issuedCertificates.set(lastGeneratedCertificate.code, lastGeneratedCertificate);
+        persistCertificates();
+    }
+
+    const successModal = document.getElementById('successModal');
+    const successCode = document.getElementById('successCode');
+    if (successModal && successCode) {
+        successCode.textContent = lastGeneratedCertificate?.code || "CH-????";
+        successModal.setAttribute('aria-hidden', 'false');
+    }
+}
 
 function generateCertificateCode() {
     const part1 = Math.floor(100000 + Math.random() * 900000);
@@ -942,9 +1227,58 @@ function renderCertificateDetails(certificate) {
     }
 
     renderCertificateInfoList(certificate);
-    renderAttachmentGallery(certificateAttachmentsEl, certificate.attachments, {
-        emptyPlaceholder: t("certificate.attachmentsEmpty")
-    });
+
+    // Handle Right Sidebar (Attachments -> Admin Comment)
+    // We want to replace the "Attachments" block with "Admin Comment"
+    if (certificateAttachmentsEl) {
+        const rightSidebar = certificateAttachmentsEl.parentNode; // .certificate-block
+        if (rightSidebar) {
+            // Clear existing content (Attachments title and list)
+            rightSidebar.innerHTML = '';
+
+            // Create Admin Comment Section
+            if (certificate.adminComment) {
+                const title = document.createElement('h3');
+                title.textContent = "Opis Administracji"; // Hardcoded for now or use translation
+                rightSidebar.appendChild(title);
+
+                const content = document.createElement('div');
+                content.className = 'admin-comment-section';
+                content.innerHTML = `<p>${certificate.adminComment}</p>`;
+                rightSidebar.appendChild(content);
+                function toBase64(file) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.readAsDataURL(file);
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = error => reject(error);
+                    });
+                }
+                // Add QR Code here as well
+                const qrDiv = document.createElement('div');
+                qrDiv.style.marginTop = '20px';
+                qrDiv.style.background = 'white';
+                qrDiv.style.padding = '10px';
+                qrDiv.style.borderRadius = '8px';
+                qrDiv.style.display = 'inline-block';
+                rightSidebar.appendChild(qrDiv);
+
+                renderQr(certificate.code, qrDiv);
+
+                rightSidebar.style.display = 'block'; // Ensure it's visible if there's a comment
+            } else {
+                // If no comment, maybe hide the block or show empty state?
+                // User said "attachments available only for me", implying public shouldn't see them.
+                // If no admin comment, we can leave it empty or hide it.
+                // Let's hide it to be clean.
+                rightSidebar.style.display = 'none';
+            }
+        }
+    }
+
+    // Remove the previous injection if it exists (cleanup)
+    const oldAdminSection = document.getElementById('adminCommentSection');
+    if (oldAdminSection) oldAdminSection.remove();
 }
 
 function renderCertificateInfoList(certificate) {
@@ -973,11 +1307,10 @@ function renderMissingCertificate(code) {
             <div class="certificate-header">
                 <span class="status-label status-invalid">${t("verify.invalidTitle")}</span>
                 <h2>${t("certificate.missingTitle")}</h2>
-                ${
-                    code
-                        ? `<p>${formatMessage("certificate.missingDescription", { code: escapeHtml(code) })}</p>`
-                        : `<p>${t("certificate.missingNoCode")}</p>`
-                }
+                ${code
+                ? `<p>${formatMessage("certificate.missingDescription", { code: escapeHtml(code) })}</p>`
+                : `<p>${t("certificate.missingNoCode")}</p>`
+            }
             </div>
             <div class="certificate-actions">
                 <a class="btn-secondary" href="verify.html">${t("certificate.missingBack")}</a>

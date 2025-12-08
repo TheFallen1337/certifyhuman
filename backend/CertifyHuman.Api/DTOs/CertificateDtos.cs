@@ -9,7 +9,11 @@ public record CertificateRequest(
     [property: Required] string Type,
     string? Description,
     [property: Required] string AiUsage,
-    IEnumerable<string>? Attachments
+    IEnumerable<string>? Attachments,
+    string? ImageBase64,
+    string? ContentText,
+    string? AttachmentBase64,
+    string? AttachmentFileName
 );
 
 public record CertificateResponse(
@@ -22,7 +26,9 @@ public record CertificateResponse(
     string AiUsage,
     string Status,
     DateTime CreatedAt,
-    IEnumerable<string> Attachments
+    IEnumerable<string> Attachments,
+    string? AdminComment,
+    string? AiAnalysisResult
 );
 
 public record CertificateCreatedResponse(string Code, string Status, string PaymentLink, string PaymentId);

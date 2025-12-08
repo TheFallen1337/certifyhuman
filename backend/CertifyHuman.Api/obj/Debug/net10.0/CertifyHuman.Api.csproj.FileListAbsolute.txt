@@ -95,7 +95,6 @@
 /Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/obj/Debug/net10.0/rjsmrazor.dswa.cache.json
 /Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json
 /Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/obj/Debug/net10.0/scopedcss/bundle/CertifyHuman.Api.styles.css
-/Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/obj/Debug/net10.0/compressed/v3bjfn23jq-{0}-puus492n02-puus492n02.gz
 /Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/obj/Debug/net10.0/staticwebassets.build.json
 /Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/obj/Debug/net10.0/staticwebassets.build.json.cache
 /Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/obj/Debug/net10.0/staticwebassets.development.json
@@ -132,3 +131,15 @@
 /Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/bin/Debug/net10.0/runtimes/win-arm64/native/e_sqlite3.dll
 /Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/bin/Debug/net10.0/runtimes/win-x64/native/e_sqlite3.dll
 /Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/bin/Debug/net10.0/runtimes/win-x86/native/e_sqlite3.dll
+/Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/obj/Debug/net10.0/CertifyHuman.Api.sourcelink.json
+/Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/obj/Debug/net10.0/compressed/v3bjfn23jq-{0}-oritt0d9cz-oritt0d9cz.gz
+/Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/bin/Debug/net10.0/DocumentFormat.OpenXml.dll
+/Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/bin/Debug/net10.0/DocumentFormat.OpenXml.Framework.dll
+/Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/bin/Debug/net10.0/UglyToad.PdfPig.Core.dll
+/Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/bin/Debug/net10.0/UglyToad.PdfPig.DocumentLayoutAnalysis.dll
+/Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/bin/Debug/net10.0/UglyToad.PdfPig.Fonts.dll
+/Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/bin/Debug/net10.0/UglyToad.PdfPig.Package.dll
+/Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/bin/Debug/net10.0/UglyToad.PdfPig.Tokenization.dll
+/Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/bin/Debug/net10.0/UglyToad.PdfPig.Tokens.dll
+/Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/bin/Debug/net10.0/UglyToad.PdfPig.dll
+/Users/patrykjurczak/Desktop/StronaWWW/backend/CertifyHuman.Api/bin/Debug/net10.0/System.IO.Packaging.dll

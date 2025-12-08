@@ -3,70 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CertifyHuman – Panel admina</title>
+    <title>CertifyHuman - Admin Panel</title>
+    <link rel="stylesheet" href="../style.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 24px; background: #f5f5f5; color: #111; }
-        h1 { margin-bottom: 12px; }
-        table { width: 100%; border-collapse: collapse; background: #fff; }
-        th, td { padding: 10px 12px; border-bottom: 1px solid #ddd; text-align: left; }
-        th { background: #0f172a; color: #fff; }
-        tr:nth-child(even) { background: #f7fafc; }
-        button { margin-right: 6px; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; }
-        button.approve { background: #16a34a; color: #fff; }
-        button.reject { background: #dc2626; color: #fff; }
-        .note { font-size: 12px; color: #555; margin-top: 4px; }
+        body { padding: 2rem; max-width: 1200px; margin: 0 auto; }
+        .admin-container { display: none; }
+        .login-container { max-width: 400px; margin: 100px auto; text-align: center; }
+        .cert-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.5rem; margin-bottom: 1rem; border-radius: 12px; }
+        .cert-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .cert-actions { display: flex; gap: 1rem; margin-top: 1rem; }
+        .btn-approve { background: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; }
+        .btn-reject { background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; }
+        textarea { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 0.5rem; border-radius: 6px; margin-top: 0.5rem; }
     </style>
 </head>
 <body>
-    <h1>CertifyHuman – certyfikaty do weryfikacji</h1>
-    <p>Panel prezentacyjny. Wymaga uruchomionego API i poprawnej konfiguracji CORS.</p>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Kod</th>
-                <th>Tytuł</th>
-                <th>Autor</th>
-                <th>AI usage</th>
-                <th>Akcje</th>
-            </tr>
-        </thead>
-        <tbody id="cert-body"></tbody>
-    </table>
+    <div id="loginView" class="login-container">
+        <h2>Admin Login</h2>
+        <input type="password" id="apiKey" placeholder="Enter Admin Key" style="padding: 0.5rem; width: 100%; margin-bottom: 1rem; background: #222; border: 1px solid #444; color: white;">
+        <button onclick="login()" class="btn-primary">Login</button>
+    </div>
+
+    <div id="adminView" class="admin-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>Awaiting Certificates</h1>
+            <button onclick="logout()" style="background: transparent; border: 1px solid #666; color: #aaa; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;">Logout</button>
+        </div>
+        <div id="certList">Loading...</div>
+    </div>
 
     <script>
-        const apiBase = window.location.origin;
+        const API_BASE = "https://certifyhuman.onrender.com"; // Or local if testing
+        // const API_BASE = "http://localhost:5000"; 
+
+        function login() {
+            const key = document.getElementById('apiKey').value;
+            if (key) {
+                localStorage.setItem('adminKey', key);
+                showAdmin();
+                loadCertificates();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('adminKey');
+            location.reload();
+        }
+
+        function showAdmin() {
+            document.getElementById('loginView').style.display = 'none';
+            document.getElementById('adminView').style.display = 'block';
+        }
 
         async function loadCertificates() {
-            const res = await fetch(`${apiBase}/api/certificates/all`);
-            const data = await res.json();
-            const awaiting = data.filter(c => c.status === 'awaiting_review');
-            const body = document.getElementById('cert-body');
-            body.innerHTML = awaiting.map(cert => `
-                <tr>
-                    <td>${cert.code}</td>
-                    <td>${cert.title}</td>
-                    <td>${cert.creator}</td>
-                    <td>${cert.aiUsage}</td>
-                    <td>
-                        <button class="approve" onclick="decide('${cert.code}', 'approve')">Zaakceptuj</button>
-                        <button class="reject" onclick="decide('${cert.code}', 'reject')">Odrzuć</button>
-                    </td>
-                </tr>
-            `).join('');
+            const key = localStorage.getItem('adminKey');
+            try {
+                const res = await fetch(`${API_BASE}/api/certificates/all`, {
+                    headers: { 'X-Admin-Key': key }
+                });
+                
+                if (res.status === 401) {
+                    alert("Invalid Key");
+                    logout();
+                    return;
+                }
+
+                const data = await res.json();
+                const awaiting = data.filter(c => c.status === 'awaiting_review' || c.status === 'pending_payment'); // Show pending too just in case
+                renderList(awaiting);
+            } catch (e) {
+                console.error(e);
+                document.getElementById('certList').innerText = "Error loading certificates.";
+            }
+        }
+
+        function renderList(certs) {
+            const container = document.getElementById('certList');
+            container.innerHTML = '';
+            
+            if (certs.length === 0) {
+                container.innerHTML = '<p>No certificates awaiting review.</p>';
+                return;
+            }
+
+            certs.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'cert-card';
+                div.innerHTML = `
+                    <div class="cert-header">
+                        <h3>${c.title} <small style="color: #888">(${c.code})</small></h3>
+                        <span style="background: #333; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem">${c.status}</span>
+                    </div>
+                    <p><strong>Creator:</strong> ${c.creator} (${c.email})</p>
+                    <p><strong>Type:</strong> ${c.type}</p>
+                    <p><strong>AI Usage:</strong> ${c.aiUsage}</p>
+                    <p><strong>Description:</strong> ${c.description || '-'}</p>
+                    <p><strong>Attachments:</strong> ${c.attachments.length > 0 ? c.attachments.join(', ') : 'None'}</p>
+                    
+                    <div>
+                        <label>Admin Comment (Public):</label>
+                        <textarea id="note-${c.code}" rows="2" placeholder="e.g. Verified by Admin"></textarea>
+                    </div>
+
+                    <div class="cert-actions">
+                        <button class="btn-approve" onclick="decide('${c.code}', 'approve')">Approve</button>
+                        <button class="btn-reject" onclick="decide('${c.code}', 'reject')">Reject</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
         }
 
         async function decide(code, action) {
-            const note = prompt('Notatka (opcjonalnie):', '');
-            await fetch(`${apiBase}/api/certificates/${code}/${action}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ note })
-            });
-            loadCertificates();
+            const key = localStorage.getItem('adminKey');
+            const note = document.getElementById(`note-${code}`).value;
+            
+            if (!confirm(`Are you sure you want to ${action} this certificate?`)) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/certificates/${code}/${action}`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-Admin-Key': key 
+                    },
+                    body: JSON.stringify({ note })
+                });
+
+                if (res.ok) {
+                    alert(`Certificate ${action}d!`);
+                    loadCertificates();
+                } else {
+                    alert("Error processing request");
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Network error");
+            }
         }
 
-        loadCertificates();
+        // Auto-login check
+        if (localStorage.getItem('adminKey')) {
+            showAdmin();
+            loadCertificates();
+        }
     </script>
 </body>
 </html>
