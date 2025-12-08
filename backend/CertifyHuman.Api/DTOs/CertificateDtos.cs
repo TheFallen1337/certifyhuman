@@ -2,6 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CertifyHuman.Api.DTOs;
 
+public record AttachmentFileDto(string Name, string Base64, string Type);
+
 public record CertificateRequest(
     [property: Required] string Title,
     [property: Required] string Creator,
@@ -10,6 +12,7 @@ public record CertificateRequest(
     string? Description,
     [property: Required] string AiUsage,
     IEnumerable<string>? Attachments,
+    List<AttachmentFileDto>? AttachmentFiles,
     string? ImageBase64,
     string? ContentText,
     string? AttachmentBase64,

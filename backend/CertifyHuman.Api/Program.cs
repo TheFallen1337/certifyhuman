@@ -141,8 +141,60 @@ app.MapPost("/api/certificates/new", async (CertificateRequest request, AppDbCon
         AiAnalysisResult = aiResult
     };
 
+    // 1. Save to DB
+    // 1. Save to DB
     context.Certificates.Add(certificate);
     await context.SaveChangesAsync();
+
+    // 2. Handle File Uploads (Save to Disk)
+    if (request.AttachmentFiles != null && request.AttachmentFiles.Any())
+    {
+        var uploadPath = Path.Combine("/data", "attachments", certificate.Code);
+        if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+
+        foreach (var file in request.AttachmentFiles)
+        {
+            try 
+            {
+                if (string.IsNullOrEmpty(file.Base64)) continue;
+
+                // Remove data:image/png;base64, prefix if present
+                var base64Data = file.Base64.Contains(",") ? file.Base64.Split(',')[1] : file.Base64;
+                var bytes = Convert.FromBase64String(base64Data);
+                var filePath = Path.Combine(uploadPath, file.Name); // Note: Should sanitize filename in prod
+                await File.WriteAllBytesAsync(filePath, bytes);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving file {file.Name}: {ex.Message}");
+            }
+        }
+    }
+
+    // 2. Handle File Uploads (Save to Disk)
+    if (request.AttachmentFiles != null && request.AttachmentFiles.Any())
+    {
+        var uploadPath = Path.Combine("/data", "attachments", certificate.Code);
+        if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+
+        foreach (var file in request.AttachmentFiles)
+        {
+            try 
+            {
+                if (string.IsNullOrEmpty(file.Base64)) continue;
+
+                // Remove data:image/png;base64, prefix if present
+                var base64Data = file.Base64.Contains(",") ? file.Base64.Split(',')[1] : file.Base64;
+                var bytes = Convert.FromBase64String(base64Data);
+                var filePath = Path.Combine(uploadPath, file.Name); // Note: Should sanitize filename in prod
+                await File.WriteAllBytesAsync(filePath, bytes);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving file {file.Name}: {ex.Message}");
+            }
+        }
+    }
 
     var response = new CertificateCreatedResponse(
         certificate.Code,
@@ -152,6 +204,40 @@ app.MapPost("/api/certificates/new", async (CertificateRequest request, AppDbCon
 
     return Results.Created($"/api/certificates/{certificate.Code}", response);
 }).WithName("CreateCertificate").Produces<CertificateCreatedResponse>(StatusCodes.Status201Created);
+
+// GET Attachment (Protected)
+app.MapGet("/api/certificates/{code}/attachments/{filename}", async (string code, string filename, HttpContext http) =>
+{
+    if (!ValidateAdmin(http)) return Results.Unauthorized();
+
+    var filePath = Path.Combine("/data", "attachments", code, filename);
+    if (!File.Exists(filePath)) return Results.NotFound();
+
+    var bytes = await File.ReadAllBytesAsync(filePath);
+    var contentType = "application/octet-stream"; // Default
+    if (filename.EndsWith(".pdf")) contentType = "application/pdf";
+    if (filename.EndsWith(".png")) contentType = "image/png";
+    if (filename.EndsWith(".jpg")) contentType = "image/jpeg";
+
+    return Results.File(bytes, contentType, filename);
+});
+
+// GET Attachment (Protected)
+app.MapGet("/api/certificates/{code}/attachments/{filename}", async (string code, string filename, HttpContext http) =>
+{
+    if (!ValidateAdmin(http)) return Results.Unauthorized();
+
+    var filePath = Path.Combine("/data", "attachments", code, filename);
+    if (!File.Exists(filePath)) return Results.NotFound();
+
+    var bytes = await File.ReadAllBytesAsync(filePath);
+    var contentType = "application/octet-stream"; // Default
+    if (filename.EndsWith(".pdf")) contentType = "application/pdf";
+    if (filename.EndsWith(".png")) contentType = "image/png";
+    if (filename.EndsWith(".jpg")) contentType = "image/jpeg";
+
+    return Results.File(bytes, contentType, filename);
+});
 
 app.MapGet("/api/certificates/{code}", async (string code, AppDbContext context) =>
 {

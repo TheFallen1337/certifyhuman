@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CertifyHuman - Admin Panel</title>
+    <title>CertifyHuman - Admin</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="../style.css">
     <style>
         body {
@@ -188,15 +189,74 @@
                         <h3>${c.title} <small style="color: #888">(${c.code})</small></h3>
                         <span style="background: ${statusColor}; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem">${c.status}</span>
                     </div>
-                    <p><strong>Creator:</strong> ${c.creator} (${c.email})</p>
-                    <p><strong>Type:</strong> ${c.type}</p>
-                    <p><strong>AI Usage:</strong> ${c.aiUsage}</p>
-                    <p><strong>Description:</strong> ${c.description || '-'}</p>
-                    <p><strong>Attachments:</strong> ${c.attachments.length > 0 ? c.attachments.join(', ') : 'None'}</p>
-                    ${actionsHtml}
+                let attachmentsHtml = 'None';
+                if (c.attachments && c.attachments.length > 0) {
+                    attachmentsHtml = c.attachments.map(filename => 
+                        `< a href = "${API_BASE}/api/certificates/${c.code}/attachments/${filename}" target = "_blank" style = "color: #38bdf8; text-decoration: underline; margin-right: 10px;" onclick = "downloadAttachment(event, '${c.code}', '${filename}')" > ${ filename }</a > `
+                    ).join('');
+                }
+
+                div.innerHTML = `
+                    < div class="cert-header" >
+                        <h3>${c.title} <small style="color: #888">(${c.code})</small></h3>
+                        <span style="background: ${statusColor}; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem">${c.status}</span>
+                    </div >
+                    <div style="display: flex; gap: 20px; margin-top: 10px;">
+                        <div style="flex: 1;">
+                            <p><strong>Creator:</strong> ${c.creator} (${c.email})</p>
+                            <p><strong>Type:</strong> ${c.type}</p>
+                            <p><strong>AI Usage:</strong> ${c.aiUsage}</p>
+                            <p><strong>Description:</strong> ${c.description || '-'}</p>
+                            <p><strong>Attachments:</strong> ${attachmentsHtml}</p>
+                        </div>
+                        <div style="background: white; padding: 10px; border-radius: 8px; height: fit-content;">
+                            <div id="qr-${c.code}"></div>
+                        </div>
+                    </div>
+                    ${ actionsHtml }
                 `;
                 container.appendChild(div);
+
+                // Generate QR
+                new QRCode(document.getElementById(`qr - ${ c.code } `), {
+                    text: `${ API_BASE.replace('/api', '').replace('backend', '') }/certificate.html?code=${c.code}`,
+                width: 100,
+                    height: 100
             });
+        });
+        }
+
+        async function downloadAttachment(e, code, filename) {
+            e.preventDefault();
+            const key = localStorage.getItem('adminKey');
+
+            try {
+                const res = await fetch(`${API_BASE}/api/certificates/${code}/attachments/${filename}`, {
+                    headers: { 'X-Admin-Key': key }
+                });
+
+                if (res.status === 401) {
+                    alert("Unauthorized");
+                    return;
+                }
+                if (res.status === 404) {
+                    alert("File not found (maybe it was uploaded before this feature was added?)");
+                    return;
+                }
+
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (err) {
+                console.error(err);
+                alert("Download failed");
+            }
         }
 
         async function decide(code, action) {
