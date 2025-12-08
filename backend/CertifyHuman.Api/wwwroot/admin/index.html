@@ -1,36 +1,101 @@
 <!DOCTYPE html>
 <html lang="pl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CertifyHuman - Admin Panel</title>
     <link rel="stylesheet" href="../style.css">
     <style>
-        body { padding: 2rem; max-width: 1200px; margin: 0 auto; }
-        .admin-container { display: none; }
-        .login-container { max-width: 400px; margin: 100px auto; text-align: center; }
-        .cert-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.5rem; margin-bottom: 1rem; border-radius: 12px; }
-        .cert-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-        .cert-actions { display: flex; gap: 1rem; margin-top: 1rem; }
-        .btn-approve { background: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; }
-        .btn-reject { background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; }
-        textarea { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 0.5rem; border-radius: 6px; margin-top: 0.5rem; }
+        body {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .admin-container {
+            display: none;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            text-align: center;
+        }
+
+        .cert-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 12px;
+        }
+
+        .cert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .cert-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-approve {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-reject {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-top: 0.5rem;
+        }
     </style>
 </head>
+
 <body>
 
     <div id="loginView" class="login-container">
         <h2>Admin Login</h2>
-        <input type="password" id="apiKey" placeholder="Enter Admin Key" style="padding: 0.5rem; width: 100%; margin-bottom: 1rem; background: #222; border: 1px solid #444; color: white;">
+        <input type="password" id="apiKey" placeholder="Enter Admin Key"
+            style="padding: 0.5rem; width: 100%; margin-bottom: 1rem; background: #222; border: 1px solid #444; color: white;">
         <button onclick="login()" class="btn-primary">Login</button>
     </div>
 
     <div id="adminView" class="admin-container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h1>Awaiting Certificates</h1>
-            <button onclick="logout()" style="background: transparent; border: 1px solid #666; color: #aaa; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;">Logout</button>
+            <h1>Admin Panel</h1>
+            <button onclick="logout()"
+                style="background: transparent; border: 1px solid #666; color: #aaa; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;">Logout</button>
         </div>
+
+        <h2 style="border-bottom: 1px solid #444; padding-bottom: 0.5rem; margin-bottom: 1rem;">Awaiting Review</h2>
         <div id="certList">Loading...</div>
+
+        <h2 style="border-bottom: 1px solid #444; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 3rem;">
+            History</h2>
+        <div id="historyList">Loading...</div>
     </div>
 
     <script>
@@ -62,7 +127,7 @@
                 const res = await fetch(`${API_BASE}/api/certificates/all`, {
                     headers: { 'X-Admin-Key': key }
                 });
-                
+
                 if (res.status === 401) {
                     alert("Invalid Key");
                     logout();
@@ -70,46 +135,65 @@
                 }
 
                 const data = await res.json();
-                const awaiting = data.filter(c => c.status === 'awaiting_review' || c.status === 'pending_payment'); // Show pending too just in case
-                renderList(awaiting);
+
+                // Split into Pending and History
+                const pending = data.filter(c => c.status === 'awaiting_review' || c.status === 'pending_payment');
+                const history = data.filter(c => c.status !== 'awaiting_review' && c.status !== 'pending_payment');
+
+                renderList(pending, 'certList', true);
+                renderList(history, 'historyList', false);
             } catch (e) {
                 console.error(e);
                 document.getElementById('certList').innerText = "Error loading certificates.";
             }
         }
 
-        function renderList(certs) {
-            const container = document.getElementById('certList');
+        function renderList(certs, containerId, showActions) {
+            const container = document.getElementById(containerId);
             container.innerHTML = '';
-            
+
             if (certs.length === 0) {
-                container.innerHTML = '<p>No certificates awaiting review.</p>';
+                container.innerHTML = '<p style="color: #888">No certificates in this section.</p>';
                 return;
             }
 
             certs.forEach(c => {
                 const div = document.createElement('div');
                 div.className = 'cert-card';
+
+                let statusColor = '#333';
+                if (c.status === 'approved') statusColor = '#10b981';
+                if (c.status === 'rejected') statusColor = '#ef4444';
+
+                let actionsHtml = '';
+                if (showActions) {
+                    actionsHtml = `
+                    <div>
+                        <label>Admin Comment (Public):</label>
+                        <textarea id="note-${c.code}" rows="2" placeholder="e.g. Verified by Admin"></textarea>
+                    </div>
+                    <div class="cert-actions">
+                        <button class="btn-approve" onclick="decide('${c.code}', 'approve')">Approve</button>
+                        <button class="btn-reject" onclick="decide('${c.code}', 'reject')">Reject</button>
+                    </div>`;
+                } else {
+                    actionsHtml = `
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1)">
+                        <p><strong>Decision Note:</strong> ${c.decisionNote || '-'}</p>
+                    </div>`;
+                }
+
                 div.innerHTML = `
                     <div class="cert-header">
                         <h3>${c.title} <small style="color: #888">(${c.code})</small></h3>
-                        <span style="background: #333; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem">${c.status}</span>
+                        <span style="background: ${statusColor}; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem">${c.status}</span>
                     </div>
                     <p><strong>Creator:</strong> ${c.creator} (${c.email})</p>
                     <p><strong>Type:</strong> ${c.type}</p>
                     <p><strong>AI Usage:</strong> ${c.aiUsage}</p>
                     <p><strong>Description:</strong> ${c.description || '-'}</p>
                     <p><strong>Attachments:</strong> ${c.attachments.length > 0 ? c.attachments.join(', ') : 'None'}</p>
-                    
-                    <div>
-                        <label>Admin Comment (Public):</label>
-                        <textarea id="note-${c.code}" rows="2" placeholder="e.g. Verified by Admin"></textarea>
-                    </div>
-
-                    <div class="cert-actions">
-                        <button class="btn-approve" onclick="decide('${c.code}', 'approve')">Approve</button>
-                        <button class="btn-reject" onclick="decide('${c.code}', 'reject')">Reject</button>
-                    </div>
+                    ${actionsHtml}
                 `;
                 container.appendChild(div);
             });
@@ -118,15 +202,15 @@
         async function decide(code, action) {
             const key = localStorage.getItem('adminKey');
             const note = document.getElementById(`note-${code}`).value;
-            
+
             if (!confirm(`Are you sure you want to ${action} this certificate?`)) return;
 
             try {
                 const res = await fetch(`${API_BASE}/api/certificates/${code}/${action}`, {
                     method: 'POST',
-                    headers: { 
+                    headers: {
                         'Content-Type': 'application/json',
-                        'X-Admin-Key': key 
+                        'X-Admin-Key': key
                     },
                     body: JSON.stringify({ note })
                 });
@@ -150,4 +234,5 @@
         }
     </script>
 </body>
+
 </html>
