@@ -246,9 +246,32 @@ app.Run();
 
 static bool ValidateAdmin(HttpContext http)
 {
-    if (!http.Request.Headers.TryGetValue("X-Admin-Key", out var key)) return false;
-    var adminKey = Environment.GetEnvironmentVariable("ADMIN_KEY") ?? "secret-admin-key-123"; 
-    return key == adminKey;
+    if (!http.Request.Headers.TryGetValue("X-Admin-Key", out var key)) 
+    {
+        Console.WriteLine("ValidateAdmin: Header X-Admin-Key missing");
+        return false;
+    }
+    
+    var adminKey = Environment.GetEnvironmentVariable("ADMIN_KEY");
+    if (string.IsNullOrEmpty(adminKey)) 
+    {
+        Console.WriteLine("ValidateAdmin: ADMIN_KEY env var is missing or empty! Using default.");
+        adminKey = "secret-admin-key-123";
+    }
+
+    var received = key.ToString();
+    var match = received == adminKey;
+    
+    if (!match)
+    {
+        Console.WriteLine($"ValidateAdmin: Failed. Received: '{received}', Expected: '{adminKey}'");
+    }
+    else
+    {
+        Console.WriteLine("ValidateAdmin: Success");
+    }
+
+    return match;
 }
 
 static CertificateResponse ToResponse(Certificate c) => new(
