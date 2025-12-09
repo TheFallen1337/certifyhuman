@@ -52,60 +52,66 @@
             </a>
             <div class="nav-links">
                 <a href="index.html">Powrót do strony głównej</a>
+                <button class="lang-toggle" id="langToggle" type="button" aria-label="Change language">
+                    <span class="lang-flag" id="langFlag" aria-hidden="true">🇺🇸</span>
+                    <span class="lang-label" id="langLabel">EN</span>
+                </button>
             </div>
         </div>
     </header>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script defer src="javascript.js"></script>
 
     <main class="legal-content">
-        <h1>Polityka Prywatności (RODO)</h1>
-        <p>Aktualizacja: 09.12.2025</p>
+        <h1 data-i18n="rodo.hero.title">Polityka Prywatności (RODO)</h1>
+        <p data-i18n="rodo.hero.updated">Aktualizacja: 09.12.2025</p>
 
-        <h2>1. Administrator Danych</h2>
-        <p>Administratorem Twoich danych osobowych jest <strong>Patryk Jurczak</strong>, prowadzący działalność
-            nierejestrowaną (zgodnie z art. 5 ustawy Prawo przedsiębiorców). Kontakt w sprawach ochrony danych:
-            <strong>hello@certifyhuman.com</strong>.</p>
+        <h2 data-i18n="rodo.section.controller.title">1. Administrator Danych</h2>
+        <p><span data-i18n="rodo.section.controller.body1">Administratorem jest...</span> <span
+                data-i18n="rodo.section.controller.body2">Kontakt...</span></p>
 
-        <h2>2. Jakie dane przetwarzamy i w jakim celu?</h2>
-        <p>Przetwarzamy dane, które podajesz nam dobrowolnie podczas korzystania z serwisu:</p>
+        <h2 data-i18n="rodo.section.scope.title">2. Jakie dane przetwarzamy i w jakim celu?</h2>
+        <p data-i18n="rodo.section.scope.list1">Przetwarzamy dane...</p>
         <ul>
-            <li><strong>Dane formularza zamówienia:</strong> Imię i nazwisko (lub nazwa marki), adres e-mail. Cel:
-                Realizacja usługi wydania certyfikatu (Art. 6 ust. 1 lit. b RODO).</li>
-            <li><strong>Dane płatnicze:</strong> Przetwarzane przez operatora płatności (Stripe). My otrzymujemy tylko
-                potwierdzenie statusu transakcji. Cel: Rozliczenie usługi (Art. 6 ust. 1 lit. c RODO).</li>
-            <li><strong>Pliki cookies i dane techniczne:</strong> Adres IP, typ przeglądarki. Cel: Zapewnienie
-                bezpieczeństwa i poprawnego działania serwisu (Art. 6 ust. 1 lit. f RODO).</li>
+            <li data-i18n="rodo.section.scope.list1">Dane formularza...</li>
+            <li data-i18n="rodo.section.scope.list1a">Treść zgłoszenia...</li>
+            <li data-i18n="rodo.section.scope.list2">Weryfikacja treści...</li>
+            <li data-i18n="rodo.section.scope.list3">Zabezpieczenie roszczeń...</li>
+            <li data-i18n="rodo.section.scope.list4">Realizacja obowiązków...</li>
         </ul>
 
-        <h2>3. Odbiorcy danych</h2>
-        <p>Twoje dane mogą być przekazywane podmiotom wspierającym nas w świadczeniu usług, takim jak:</p>
+        <h2 data-i18n="rodo.section.recipients.title">3. Odbiorcy danych</h2>
+        <p data-i18n="rodo.section.recipients.list1">Dostawcy płatności...</p>
         <ul>
-            <li>Dostawca hostingu (Render).</li>
-            <li>Operator płatności (Stripe).</li>
-        </ul>
-        <p>Nie sprzedajemy Twoich danych nikomu.</p>
-
-        <h2>4. Twoje prawa</h2>
-        <p>Masz prawo do:</p>
-        <ul>
-            <li>Dostępu do swoich danych.</li>
-            <li>Sprostowania (poprawiania) danych.</li>
-            <li>Usunięcia danych ("prawo do bycia zapomnianym").</li>
-            <li>Ograniczenia przetwarzania.</li>
-            <li>Wniesienia sprzeciwu wobec przetwarzania.</li>
-            <li>Przenoszenia danych.</li>
-            <li>Wniesienia skargi do organu nadzorczego (Prezes Urzędu Ochrony Danych Osobowych).</li>
+            <li data-i18n="rodo.section.recipients.list2">Dostawcy chmury...</li>
+            <li data-i18n="rodo.section.recipients.list3">Audytorzy...</li>
         </ul>
 
-        <h2>5. Okres przechowywania</h2>
-        <p>Dane przechowujemy przez okres niezbędny do realizacji usługi oraz wypełnienia obowiązków prawnych (np.
-            podatkowych), a także do czasu przedawnienia ewentualnych roszczeń.</p>
+        <h2 data-i18n="rodo.section.transfer.title">Transfer poza EOG</h2>
+        <p data-i18n="rodo.section.transfer.body">W związku z korzystaniem...</p>
 
-        <h2>6. Bezpieczeństwo</h2>
-        <p>Stosujemy odpowiednie środki techniczne i organizacyjne, aby chronić Twoje dane przed nieuprawnionym
-            dostępem, utratą czy zmianą. Połączenie ze stroną jest szyfrowane (SSL).</p>
+        <h2 data-i18n="rodo.section.rights.title">4. Twoje prawa</h2>
+        <p data-i18n="rodo.section.rights.lead">Masz prawo do:</p>
+        <ul>
+            <li data-i18n="rodo.section.rights.list1">Dostępu...</li>
+            <li data-i18n="rodo.section.rights.list2">Sprostowania...</li>
+            <li data-i18n="rodo.section.rights.list3">Usunięcia...</li>
+            <li data-i18n="rodo.section.rights.list4">Ograniczenia...</li>
+            <li data-i18n="rodo.section.rights.list5">Przenoszenia...</li>
+            <li data-i18n="rodo.section.rights.list6">Sprzeciwu...</li>
+            <li data-i18n="rodo.section.rights.list7">Skargi...</li>
+        </ul>
 
-        <h2>7. Kontakt</h2>
-        <p>Wszelkie pytania dotyczące prywatności prosimy kierować na adres: hello@certifyhuman.com.</p>
+        <h2 data-i18n="rodo.section.retention.title">5. Okres przechowywania</h2>
+        <p data-i18n="rodo.section.retention.body1">Dane transakcyjne...</p>
+        <p data-i18n="rodo.section.retention.body2">Materiały pomocnicze...</p>
+
+        <h2 data-i18n="rodo.section.security.title">6. Bezpieczeństwo</h2>
+        <p data-i18n="rodo.section.security.list1">Szyfrowanie...</p>
+
+        <h2 data-i18n="rodo.section.contact.title">7. Kontakt</h2>
+        <p data-i18n="rodo.section.contact.body1">Wyznaczyliśmy...</p>
+        <p data-i18n="rodo.section.contact.body2">Zgłoszenia...</p>
     </main>
 
     <footer class="site-footer">

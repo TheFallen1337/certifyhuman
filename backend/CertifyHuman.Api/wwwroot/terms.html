@@ -52,58 +52,63 @@
             </a>
             <div class="nav-links">
                 <a href="index.html">Powrót do strony głównej</a>
+                <button class="lang-toggle" id="langToggle" type="button" aria-label="Change language">
+                    <span class="lang-flag" id="langFlag" aria-hidden="true">🇺🇸</span>
+                    <span class="lang-label" id="langLabel">EN</span>
+                </button>
             </div>
         </div>
     </header>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script defer src="javascript.js"></script>
 
     <main class="legal-content">
-        <h1>Regulamin Serwisu CertifyHuman</h1>
-        <p>Obowiązuje od dnia 09.12.2025</p>
+        <h1 data-i18n="terms.title">Regulamin Serwisu CertifyHuman</h1>
+        <p data-i18n="terms.effectiveDate">Obowiązuje od dnia 09.12.2025</p>
 
-        <h2>§1. Postanowienia ogólne</h2>
-        <p>1. Niniejszy Regulamin określa zasady korzystania z serwisu internetowego CertifyHuman, dostępnego pod
-            adresem certifyhuman.onrender.com.</p>
-        <p>2. Właścicielem Serwisu jest Patryk Jurczak, prowadzący działalność nierejestrowaną zgodnie z art. 5 ustawy z
-            dnia 6 marca 2018 r. – Prawo przedsiębiorców.</p>
-        <p>3. Kontakt z Właścicielem jest możliwy drogą elektroniczną pod adresem e-mail: hello@certifyhuman.com.</p>
+        <h2 data-i18n="terms.section1.title">§1. Postanowienia ogólne</h2>
+        <p data-i18n="terms.section1.body1">1. Niniejszy Regulamin...</p>
+        <p data-i18n="terms.section1.body2">2. Właścicielem...</p>
+        <p data-i18n="terms.section1.body3">3. Kontakt...</p>
 
-        <h2>§2. Definicje</h2>
+        <h2 data-i18n="terms.section2.title">§2. Definicje</h2>
         <ul>
-            <li><strong>Serwis</strong> – strona internetowa CertifyHuman.</li>
-            <li><strong>Użytkownik</strong> – każda osoba fizyczna, prawna lub jednostka organizacyjna korzystająca z
-                Serwisu.</li>
-            <li><strong>Certyfikat</strong> – cyfrowe oznaczenie treści (No-AI lub AI-Assisted) wydawane przez Serwis.
-            </li>
+            <li data-i18n="terms.section2.list1" data-i18n-type="html"><strong>Serwis</strong>...</li>
+            <li data-i18n="terms.section2.list2" data-i18n-type="html"><strong>Użytkownik</strong>...</li>
+            <li data-i18n="terms.section2.list3" data-i18n-type="html"><strong>Certyfikat</strong>...</li>
+            <li data-i18n="terms.section2.list4" data-i18n-type="html"><strong>Konsument</strong>...</li>
+            <li data-i18n="terms.section2.list5" data-i18n-type="html"><strong>Przedsiębiorca na prawach
+                    konsumenta</strong>...</li>
         </ul>
 
-        <h2>§3. Usługi świadczone drogą elektroniczną</h2>
-        <p>1. Serwis umożliwia Użytkownikom składanie wniosków o wydanie Certyfikatu dla określonych treści.</p>
-        <p>2. Usługa polega na weryfikacji deklaracji Użytkownika i wygenerowaniu unikalnego kodu oraz kodu QR.</p>
-        <p>3. Korzystanie z podstawowych funkcji Serwisu jest odpłatne zgodnie z cennikiem widocznym przy składaniu
-            zamówienia.</p>
+        <h2 data-i18n="terms.section3.title">§3. Usługi świadczone drogą elektroniczną</h2>
+        <p data-i18n="terms.section3.body1">1. Serwis umożliwia...</p>
+        <p data-i18n="terms.section3.body2">2. Usługa polega...</p>
+        <p data-i18n="terms.section3.body3">3. Korzystanie...</p>
 
-        <h2>§4. Płatności i Realizacja</h2>
-        <p>1. Płatności obsługiwane są przez zewnętrznego operatora (Stripe).</p>
-        <p>2. Po dokonaniu płatności, wniosek o Certyfikat trafia do analizy.</p>
-        <p>3. Czas realizacji usługi wynosi zazwyczaj do 48 godzin roboczych.</p>
-        <p>4. W przypadku odrzucenia wniosku (np. z powodu wykrycia 100% AI w treści deklarowanej jako No-AI), opłata
-            nie podlega zwrotowi, jako koszt przeprowadzonej weryfikacji.</p>
+        <h2 data-i18n="terms.section4.title">§4. Płatności i Realizacja</h2>
+        <p data-i18n="terms.section4.body1">1. Płatności...</p>
+        <p data-i18n="terms.section4.body2">2. Po dokonaniu...</p>
+        <p data-i18n="terms.section4.body3">3. Czas realizacji...</p>
+        <p data-i18n="terms.section4.body4">4. W przypadku...</p>
+        <p data-i18n="terms.section4.body5">5. Kliknięcie...</p>
 
-        <h2>§5. Odpowiedzialność</h2>
-        <p>1. Właściciel dokłada wszelkich starań, aby Serwis działał poprawnie, jednak nie gwarantuje jego
-            nieprzerwanej dostępności.</p>
-        <p>2. Użytkownik ponosi pełną odpowiedzialność za prawdziwość danych podanych we wniosku o Certyfikat.</p>
-        <p>3. Właściciel ma prawo cofnąć Certyfikat w przypadku wykrycia naruszenia Regulaminu lub fałszywych
-            deklaracji.</p>
+        <h2 data-i18n="terms.section5.title">§5. Odstąpienie od umowy</h2>
+        <p data-i18n="terms.section5.body1">1. Zgodnie z art. 38...</p>
+        <p data-i18n="terms.section5.body2">2. Użytkownik...</p>
 
-        <h2>§6. Reklamacje</h2>
-        <p>1. Reklamacje dotyczące działania Serwisu można zgłaszać na adres e-mail: hello@certifyhuman.com.</p>
-        <p>2. Reklamacje rozpatrywane są w terminie 14 dni od daty ich otrzymania.</p>
+        <h2 data-i18n="terms.section6.title">§6. Odpowiedzialność</h2>
+        <p data-i18n="terms.section6.body1">1. Właściciel...</p>
+        <p data-i18n="terms.section6.body2">2. Użytkownik...</p>
+        <p data-i18n="terms.section6.body3">3. Właściciel...</p>
 
-        <h2>§7. Postanowienia końcowe</h2>
-        <p>1. W sprawach nieuregulowanych niniejszym Regulaminem mają zastosowanie przepisy Kodeksu cywilnego oraz inne
-            właściwe przepisy prawa polskiego.</p>
-        <p>2. Właściciel zastrzega sobie prawo do zmiany Regulaminu.</p>
+        <h2 data-i18n="terms.section7.title">§7. Reklamacje</h2>
+        <p data-i18n="terms.section7.body1">1. Reklamacje...</p>
+        <p data-i18n="terms.section7.body2">2. Reklamacje...</p>
+
+        <h2 data-i18n="terms.section8.title">§8. Postanowienia końcowe</h2>
+        <p data-i18n="terms.section8.body1">1. W sprawach...</p>
+        <p data-i18n="terms.section8.body2">2. Właściciel...</p>
     </main>
 
     <footer class="site-footer">
