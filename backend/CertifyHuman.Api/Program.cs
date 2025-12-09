@@ -222,22 +222,7 @@ app.MapGet("/api/certificates/{code}/attachments/{filename}", async (string code
     return Results.File(bytes, contentType, filename);
 });
 
-// GET Attachment (Protected)
-app.MapGet("/api/certificates/{code}/attachments/{filename}", async (string code, string filename, HttpContext http) =>
-{
-    if (!ValidateAdmin(http)) return Results.Unauthorized();
 
-    var filePath = Path.Combine("/data", "attachments", code, filename);
-    if (!File.Exists(filePath)) return Results.NotFound();
-
-    var bytes = await File.ReadAllBytesAsync(filePath);
-    var contentType = "application/octet-stream"; // Default
-    if (filename.EndsWith(".pdf")) contentType = "application/pdf";
-    if (filename.EndsWith(".png")) contentType = "image/png";
-    if (filename.EndsWith(".jpg")) contentType = "image/jpeg";
-
-    return Results.File(bytes, contentType, filename);
-});
 
 app.MapGet("/api/certificates/{code}", async (string code, AppDbContext context) =>
 {
