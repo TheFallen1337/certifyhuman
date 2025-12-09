@@ -168,7 +168,6 @@ const translations = {
         "rodo.section.retention.body1": "Dane transakcyjne i certyfikatów przechowujemy przez 72 miesiące od zakończenia umowy (wymogi podatkowe i dochodzeniowe).",
         "rodo.section.retention.body2": "Materiały pomocnicze kasujemy po 12 miesiącach od decyzji „approve/reject”, chyba że konieczne jest dłuższe przechowywanie ze względu na spór prawny.",
         "rodo.section.transfer.title": "Transfer poza EOG",
-        "rodo.section.transfer.title": "Transfer poza EOG",
         "rodo.section.transfer.body": "W związku z korzystaniem z usług dostawców takich jak Stripe (płatności) oraz Render (hosting), Twoje dane mogą być przekazywane do państw trzecich, w tym do USA. Przekazywanie to odbywa się na podstawie Standardowych Klauzul Umownych (SCC) lub decyzji stwierdzających odpowiedni stopień ochrony (Data Privacy Framework), co zapewnia bezpieczeństwo Twoich danych.",
         "rodo.section.recipients.title": "Odbiorcy danych",
         "rodo.section.recipients.list1": "Dostawcy płatności (Stripe/Przelewy24) – wyłącznie w zakresie płatności i fakturowania.",
@@ -871,7 +870,9 @@ async function handleCertificateSubmit(event) {
     const desc = document.getElementById("contentDescription").value.trim();
     const aiUsage = (document.querySelector("input[name='aiUsage']:checked") || {}).value;
 
-    if (!title || !creator || !email || !type || !aiUsage) {
+    const waiver = document.getElementById("waiverCheckbox");
+
+    if (!title || !creator || !email || !type || !aiUsage || !waiver?.checked) {
         alert(t("form.validationError"));
         return;
     }
