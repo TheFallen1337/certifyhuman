@@ -13,10 +13,11 @@
 <body data-page="home">
     <header>
         <div class="nav">
-            <div class="logo">
+            <a href="index.html" class="logo"
+                style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
                 <span class="icon"></span>
                 <span>CERTIFYHUMAN</span>
-            </div>
+            </a>
             <div class="nav-links">
                 <a href="#how" data-i18n="nav.how">Jak to działa</a>
                 <a href="#generate" data-i18n="nav.generate">Wydaj certyfikat</a>
@@ -177,7 +178,7 @@
                                 <span data-i18n="form.aiDisabled">100% AI (nieobsługiwane)</span>
                             </label>
                         </div>
-                        <div class="hint" data-i18n="form.aiHint">
+                        <div class="hint" data-i18n="form.aiHint" data-i18n-type="html">
                             Akceptujemy tylko treści, gdzie <strong>człowiek jest głównym autorem</strong>.
                             Wersja 100% AI nie otrzyma certyfikatu.
                         </div>
@@ -306,7 +307,8 @@
         <div>
             <span data-i18n="footer.disclaimer">CertifyHuman przetwarza dane zgodnie z RODO. Pełne zasady znajdziesz
                 poniżej.</span>
-            <a href="rodo.html" data-i18n="footer.rodoLink">RODO / Przetwarzanie danych</a>
+            <a href="rodo.html" data-i18n="footer.rodoLink">Polityka Prywatności</a> | <a
+                href="terms.html">Regulamin</a>
         </div>
     </footer>
     <!-- MODALS -->
