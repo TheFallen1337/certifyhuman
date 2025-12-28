@@ -171,7 +171,8 @@ main {
 
 .hero-gradient {
     background: linear-gradient(to right, var(--accent), var(--accent-alt));
-    color: var(--accent); /* fallback for browsers without text clipping */
+    color: var(--accent);
+    /* fallback for browsers without text clipping */
 }
 
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
@@ -337,7 +338,7 @@ main {
     margin-bottom: 16px;
 }
 
-.how-card > p {
+.how-card>p {
     font-size: 17px;
     color: var(--text);
     margin-bottom: 18px;
@@ -648,6 +649,7 @@ textarea:focus {
     color: var(--text);
     font-size: 13px;
 }
+
 /* Wynik kodu */
 .code-result {
     margin-top: 10px;
@@ -890,10 +892,12 @@ body[data-page="certificate"] main {
         transform: scale(0.98);
         opacity: 0.6;
     }
+
     50% {
         transform: scale(1.02);
         opacity: 1;
     }
+
     100% {
         transform: scale(0.98);
         opacity: 0.6;
@@ -991,6 +995,7 @@ body[data-page="certificate"] main {
 
 /* Responsive */
 @media (max-width: 840px) {
+
     .hero,
     .section-grid,
     .steps,
@@ -1063,7 +1068,7 @@ body[data-page="certificate"] main {
     max-width: 400px;
     width: 90%;
     text-align: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
     transform: translateY(20px);
     transition: transform 0.3s ease;
 }
@@ -1154,7 +1159,7 @@ body[data-page="certificate"] main {
     z-index: 0;
 }
 
-.premium-pricing-badge > * {
+.premium-pricing-badge>* {
     position: relative;
     z-index: 1;
 }
@@ -1179,11 +1184,74 @@ body[data-page="certificate"] main {
 }
 
 @keyframes badge-pulse {
-    0%, 100% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2); }
-    50% { box-shadow: 0 0 50px rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); }
+
+    0%,
+    100% {
+        box-shadow: 0 0 30px rgba(16, 185, 129, 0.05);
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 0 50px rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.4);
+    }
 }
 
 @keyframes rotate-bg {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Premium CTA Button (Main Page) */
+.btn-premium-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 18px 42px;
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #fff;
+    background: linear-gradient(135deg, var(--accent), #4f46e5);
+    border: none;
+    border-radius: 999px;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn-premium-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #4f46e5, var(--accent));
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+}
+
+.btn-premium-cta:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 0 40px rgba(56, 189, 248, 0.7);
+}
+
+.btn-premium-cta:hover::before {
+    opacity: 1;
+}
+
+.btn-premium-cta .icon {
+    font-size: 24px;
 }
