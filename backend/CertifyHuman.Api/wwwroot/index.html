@@ -25,9 +25,9 @@
                 <a href="about.html" data-i18n="nav.about">O nas</a>
             </div>
             <div class="nav-actions">
-                <button class="nav-cta" id="navCta" type="button" data-scroll-target="generate">
+                <a href="apply.html" class="nav-cta" id="navCta">
                     <span data-i18n="nav.cta">Get certificate</span>
-                </button>
+                </a>
                 <button class="lang-toggle" id="langToggle" type="button" aria-label="Change language">
                     <span class="lang-flag" id="langFlag" aria-hidden="true">🇺🇸</span>
                     <span class="lang-label" id="langLabel">EN</span>
@@ -128,145 +128,17 @@
             </ul>
         </section>
 
-        <!-- GENERATE -->
-        <section id="generate" class="section-grid">
+        <!-- GENERATE PROMO -->
+        <section id="generate" class="section-grid" style="text-align: center;">
             <div class="card">
                 <h3 data-i18n="form.heading">Wydaj certyfikat (beta)</h3>
-                <p data-i18n="form.lead">Uzupełnij brief treści, wybierz deklarację AI i dołącz dowody pracy. W sekundę
-                    otrzymasz numer CH oraz QR do publikacji.</p>
-
-                <form id="certificateForm">
-                    <div>
-                        <label for="contentTitle" data-i18n="form.titleLabel">Nazwa / tytuł treści</label>
-                        <input type="text" id="contentTitle" placeholder="np. Artykuł: 'Dlaczego AI nie zastąpi ludzi?'"
-                            data-i18n-placeholder="form.titlePlaceholder" required />
-                    </div>
-                    <div>
-                        <label for="creatorName" data-i18n="form.creatorLabel">Autor / marka</label>
-                        <input type="text" id="creatorName" placeholder="Twoje imię / nazwa marki"
-                            data-i18n-placeholder="form.creatorPlaceholder" required />
-                    </div>
-                    <div>
-                        <label for="creatorEmail" data-i18n="form.emailLabel">E-mail (wyślemy tam potwierdzenie)</label>
-                        <input type="email" id="creatorEmail" placeholder="kontakt@twojamarka.com"
-                            data-i18n-placeholder="form.emailPlaceholder" required />
-                    </div>
-                    <div>
-                        <label for="contentType" data-i18n="form.typeLabel">Typ treści</label>
-                        <select id="contentType" required>
-                            <option value="" data-i18n="form.typeDefault">Wybierz...</option>
-                            <option value="article" data-i18n="form.typeArticle">Artykuł / tekst</option>
-                            <option value="video" data-i18n="form.typeVideo">Wideo / content social</option>
-                            <option value="image" data-i18n="form.typeImage">Grafika / zdjęcie</option>
-                            <option value="audio" data-i18n="form.typeAudio">Audio / podcast / muzyka</option>
-                            <option value="other" data-i18n="form.typeOther">Inne</option>
-                        </select>
-                    </div>
-                    <div>
-                        <span class="label" data-i18n="form.aiLabel">Deklaracja użycia AI</span>
-                        <div class="inline-options">
-                            <label>
-                                <input type="radio" name="aiUsage" value="no-ai" required />
-                                <span data-i18n="form.aiNoAi">100% bez AI (No-AI)</span>
-                            </label>
-                            <label>
-                                <input type="radio" name="aiUsage" value="ai-assisted" />
-                                <span data-i18n="form.aiAssisted">Z pomocą AI (AI-Assisted)</span>
-                            </label>
-                            <label style="opacity:0.35; pointer-events:none;">
-                                <input type="radio" disabled />
-                                <span data-i18n="form.aiDisabled">100% AI (nieobsługiwane)</span>
-                            </label>
-                        </div>
-                        <div class="hint" data-i18n="form.aiHint" data-i18n-type="html">
-                            Akceptujemy tylko treści, gdzie <strong>człowiek jest głównym autorem</strong>.
-                            Wersja 100% AI nie otrzyma certyfikatu.
-                        </div>
-                    </div>
-                    <div>
-                        <label for="contentDescription" data-i18n="form.processLabel">Proces tworzenia (opis dla
-                            certyfikatora)</label>
-                        <textarea id="contentDescription"
-                            placeholder="Opisz, jak powstawała treść: narzędzia, etapy, udział ludzi vs AI. To pole pomaga w samo-weryfikacji."
-                            data-i18n-placeholder="form.processPlaceholder"></textarea>
-                    </div>
-
-                    <div>
-                        <label for="evidenceFiles" data-i18n="form.attachmentsLabel">Załączniki (dowody pracy własnej,
-                            maks. 5 plików)</label>
-                        <input type="file" id="evidenceFiles" multiple accept="image/*,.pdf,.doc,.docx,.txt,.zip" />
-                        <div class="hint" data-i18n="form.attachmentsHint">
-                            Dołącz szkice, screeny z procesu lub inne dowody pracy własnej. W tej wersji beta pliki
-                            pozostają wyłącznie w Twojej przeglądarce.
-                        </div>
-                        <ul id="evidenceList" class="evidence-list"></ul>
-                    </div>
-
-                    <div>
-                        <span class="label" data-i18n="form.paymentLabel">Płatność i aktywacja</span>
-                        <div class="hint" data-i18n="form.paymentHint">
-                            Kliknięcie przycisku uruchamia przykładowy checkout i natychmiast aktywuje certyfikat w tej
-                            wersji prezentacyjnej.
-                        </div>
-                        <div style="margin-top: 1rem;">
-                            <label
-                                style="display: flex; gap: 0.5rem; align-items: flex-start; font-size: 0.9rem; color: var(--text-secondary);">
-                                <input type="checkbox" id="waiverCheckbox" required />
-                                <span data-i18n="form.waiverLabel">Wyrażam zgodę na rozpoczęcie świadczenia usługi
-                                    (weryfikacji i wydania certyfikatu) przed upływem 14-dniowego terminu do odstąpienia
-                                    od umowy i przyjmuję do wiadomości, że po spełnieniu świadczenia przez
-                                    przedsiębiorcę utracę prawo do odstąpienia od umowy.</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-primary">
+                <p data-i18n="form.lead">Uzupełnij brief treści, wybierz deklarację AI i dołącz dowody pracy.</p>
+                <div style="margin-top: 2rem;">
+                    <a href="apply.html" class="btn-primary">
                         <span class="icon" aria-hidden="true">⚡</span>
-                        <span data-i18n="form.submit">Wygeneruj certyfikat + kod + QR</span>
-                    </button>
-                </form>
-
-                <div id="codeResult" class="code-result" aria-live="polite">
-                    <div>
-                        <div class="code-block">
-                            <span data-i18n="code.label">Kod certyfikatu:</span>
-                            <strong id="generatedCode">CH-XXXX-XXXX</strong>
-                        </div>
-                        <div class="code-meta" id="codeMeta"></div>
-                        <div class="code-meta" data-i18n="code.instructions">
-                            Możesz wkleić ten kod w opis treści lub osadzić poniższy QR.
-                            Odbiorca po wejściu na stronę i wpisaniu kodu (lub skanie QR)
-                            zweryfikuje status certyfikatu.
-                        </div>
-                        <div id="attachmentPreview" class="attachment-preview"></div>
-                    </div>
-                    <div class="qr-wrapper" aria-hidden="true">
-                        <div id="qrcode"></div>
-                    </div>
+                        <span data-i18n="nav.cta">Get certificate</span>
+                    </a>
                 </div>
-            </div>
-
-            <!-- VERIFY -->
-            <div id="verify" class="card">
-                <h3 data-i18n="verify.heading">Zweryfikuj kod certyfikatu</h3>
-                <p data-i18n="verify.lead">
-                    Masz numer CH lub zeskanowałeś QR? Wpisz go poniżej i zobacz status treści wraz z deklaracją użycia
-                    AI.
-                </p>
-
-                <div class="verify-input-row">
-                    <input type="text" id="verifyCodeInput" placeholder="np. CH-274918-839201"
-                        data-i18n-placeholder="verify.placeholder" />
-                    <button class="btn-ghost" id="verifyButton" type="button">
-                        <span data-i18n="verify.button">Sprawdź</span>
-                    </button>
-                </div>
-                <div class="hint" data-i18n="verify.hint">
-                    Prywatna beta: weryfikacja obejmuje kody zapisane w tej przeglądarce. W finalnej wersji każdy kod
-                    będzie sprawdzany 24/7 w chmurze.
-                </div>
-
-                <div id="verifyResult" class="verify-result" aria-live="polite"></div>
             </div>
         </section>
 

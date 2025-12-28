@@ -30,7 +30,8 @@ public record CertificateResponse(
     string Status,
     DateTime CreatedAt,
     IEnumerable<string> Attachments,
-    string? AdminComment,
+    string? StartDecisionNote, // Renaming to avoid confusion if needed, or just keeping legacy
+    string? AdminComment, // This is the new public note
     string? AiAnalysisResult
 );
 
@@ -42,4 +43,4 @@ public record PaymentWebhookRequest(
     string? RawPayload
 );
 
-public record DecisionRequest(string? Note);
+public record DecisionRequest(string? Note, string? AdminComment);

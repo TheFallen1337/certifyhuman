@@ -158,35 +158,14 @@ app.MapPost("/api/certificates/new", async (CertificateRequest request, AppDbCon
             {
                 if (string.IsNullOrEmpty(file.Base64)) continue;
 
-                // Remove data:image/png;base64, prefix if present
-                var base64Data = file.Base64.Contains(",") ? file.Base64.Split(',')[1] : file.Base64;
-                var bytes = Convert.FromBase64String(base64Data);
-                var filePath = Path.Combine(uploadPath, file.Name); // Note: Should sanitize filename in prod
-                await File.WriteAllBytesAsync(filePath, bytes);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error saving file {file.Name}: {ex.Message}");
-            }
-        }
-    }
-
-    // 2. Handle File Uploads (Save to Disk)
-    if (request.AttachmentFiles != null && request.AttachmentFiles.Any())
-    {
-        var uploadPath = Path.Combine("/data", "attachments", certificate.Code);
-        if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
-
-        foreach (var file in request.AttachmentFiles)
-        {
-            try 
-            {
-                if (string.IsNullOrEmpty(file.Base64)) continue;
+                // SECURITY: Sanitize filename
+                var safeName = Path.GetFileName(file.Name); 
+                if (string.IsNullOrWhiteSpace(safeName) || safeName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0) continue;
 
                 // Remove data:image/png;base64, prefix if present
                 var base64Data = file.Base64.Contains(",") ? file.Base64.Split(',')[1] : file.Base64;
                 var bytes = Convert.FromBase64String(base64Data);
-                var filePath = Path.Combine(uploadPath, file.Name); // Note: Should sanitize filename in prod
+                var filePath = Path.Combine(uploadPath, safeName); 
                 await File.WriteAllBytesAsync(filePath, bytes);
             }
             catch (Exception ex)
@@ -209,6 +188,10 @@ app.MapPost("/api/certificates/new", async (CertificateRequest request, AppDbCon
 app.MapGet("/api/certificates/{code}/attachments/{filename}", async (string code, string filename, HttpContext http) =>
 {
     if (!ValidateAdmin(http)) return Results.Unauthorized();
+
+    // Sanitize
+    filename = Path.GetFileName(filename);
+    code = Path.GetFileName(code); // just in case
 
     var filePath = Path.Combine("/data", "attachments", code, filename);
     if (!File.Exists(filePath)) return Results.NotFound();
@@ -233,7 +216,7 @@ app.MapGet("/api/certificates/{code}", async (string code, AppDbContext context)
 
     return certificate is null
         ? Results.NotFound()
-        : Results.Ok(ToResponse(certificate));
+        : Results.Ok(ToResponse(certificate, includePrivateData: false));
 }).WithName("GetApprovedCertificate").Produces<CertificateResponse>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound);
 
 app.MapGet("/api/certificates/all", async (HttpContext http, AppDbContext context) =>
@@ -245,7 +228,7 @@ app.MapGet("/api/certificates/all", async (HttpContext http, AppDbContext contex
         .OrderByDescending(c => c.CreatedAt)
         .ToListAsync();
 
-    return Results.Ok(certificates.Select(ToResponse));
+    return Results.Ok(certificates.Select(c => ToResponse(c, includePrivateData: true)));
 }).WithName("GetAllCertificates");
 
 app.MapPost("/api/payment/webhook", async (PaymentWebhookRequest payload, AppDbContext context, StripeSettings stripeOptions) =>
@@ -284,9 +267,10 @@ app.MapPost("/api/certificates/{code}/approve", async (string code, DecisionRequ
 
     certificate.Status = "approved";
     certificate.DecisionNote = decision?.Note;
+    certificate.AdminComment = decision?.AdminComment;
     await context.SaveChangesAsync();
 
-    return Results.Ok(ToResponse(certificate));
+    return Results.Ok(ToResponse(certificate, includePrivateData: true));
 }).WithName("ApproveCertificate");
 
 app.MapPost("/api/certificates/{code}/reject", async (string code, DecisionRequest? decision, HttpContext http, AppDbContext context) =>
@@ -301,9 +285,10 @@ app.MapPost("/api/certificates/{code}/reject", async (string code, DecisionReque
 
     certificate.Status = "rejected";
     certificate.DecisionNote = decision?.Note;
+    certificate.AdminComment = decision?.AdminComment;
     await context.SaveChangesAsync();
 
-    return Results.Ok(ToResponse(certificate));
+    return Results.Ok(ToResponse(certificate, includePrivateData: true));
 }).WithName("RejectCertificate");
 
 using (var scope = app.Services.CreateScope())
@@ -319,24 +304,20 @@ static bool ValidateAdmin(HttpContext http)
 {
     if (!http.Request.Headers.TryGetValue("X-Admin-Key", out var key)) 
     {
-        Console.WriteLine("ValidateAdmin: Header X-Admin-Key missing");
+        // Console.WriteLine("ValidateAdmin: Header X-Admin-Key missing");
         return false;
     }
     
     var received = key.ToString();
-
-    // Hardcoded check to ensure it works regardless of Env Var issues
-    if (received == "BIALYLASTRZYNASCIEDOG123") return true;
-
-    // Fallback to Env Var
     var adminKey = Environment.GetEnvironmentVariable("ADMIN_KEY");
+    
     if (!string.IsNullOrEmpty(adminKey) && received == adminKey) return true;
 
     Console.WriteLine($"ValidateAdmin: Failed. Received: '{received}'");
     return false;
 }
 
-static CertificateResponse ToResponse(Certificate c) => new(
+static CertificateResponse ToResponse(Certificate c, bool includePrivateData) => new(
     c.Code,
     c.Title,
     c.Creator,
@@ -346,8 +327,9 @@ static CertificateResponse ToResponse(Certificate c) => new(
     c.AiUsage,
     c.Status,
     c.CreatedAt,
-    c.Attachments ?? new List<string>(),
-    c.DecisionNote,
+    includePrivateData ? (c.Attachments ?? new List<string>()) : new List<string>(), // Hide attachments if public
+    c.DecisionNote, // Legacy / Internal
+    c.AdminComment, // New Public Comment
     c.AiAnalysisResult);
 
 static async Task<string> GenerateUniqueCodeAsync(AppDbContext context)

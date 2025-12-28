@@ -254,31 +254,61 @@
             }
         }
 
-        async function decide(code, action) {
+        async function approve(code) {
+            if (!confirm(`Are you sure you want to APPROVE ${code}?`)) return;
+
             const key = localStorage.getItem('adminKey');
             const note = document.getElementById(`note-${code}`).value;
-
-            if (!confirm(`Are you sure you want to ${action} this certificate?`)) return;
+            const adminComment = document.getElementById(`adminComment-${code}`).value;
 
             try {
-                const res = await fetch(`${API_BASE}/api/certificates/${code}/${action}`, {
+                const res = await fetch(`${API_BASE}/api/certificates/${code}/approve`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-Admin-Key': key
                     },
-                    body: JSON.stringify({ note })
+                    body: JSON.stringify({ note, adminComment })
                 });
 
                 if (res.ok) {
-                    alert(`Certificate ${action}d!`);
+                    alert(`Certificate ${code} APPROVED!`);
                     loadCertificates();
                 } else {
-                    alert("Error processing request");
+                    alert('Error approving.');
                 }
             } catch (e) {
                 console.error(e);
-                alert("Network error");
+                alert('Error approving.');
+            }
+        }
+
+        async function reject(code) {
+            if (!confirm(`Are you sure you want to REJECT ${code}?`)) return;
+
+            const key = localStorage.getItem('adminKey');
+            const note = document.getElementById(`note-${code}`).value;
+            const adminComment = document.getElementById(`adminComment-${code}`).value;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/certificates/${code}/reject`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Key': key
+                    },
+                    body: JSON.stringify({ note, adminComment })
+                });
+
+                if (res.ok) {
+                    alert(`Certificate ${code} REJECTED.`);
+                    loadCertificates();
+                } else {
+                    alert('Error rejecting.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error rejecting.');
             }
         }
 

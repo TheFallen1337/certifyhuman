@@ -53,5 +53,8 @@ public class Certificate
     public string? DecisionNote { get; set; }
 
     [MaxLength(2048)]
+    public string? AdminComment { get; set; }
+
+    [MaxLength(2048)]
     public string? AiAnalysisResult { get; set; }
 }

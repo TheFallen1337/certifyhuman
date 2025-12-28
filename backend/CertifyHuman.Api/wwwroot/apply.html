@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CertifyHuman - Wydaj Certyfikat</title>
+    <link rel="stylesheet" href="style.css?v=2" />
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script defer src="javascript.js?v=2"></script>
+</head>
+
+<body data-page="apply">
+    <header>
+        <div class="nav">
+            <a href="index.html" class="logo"
+                style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
+                <span class="icon"></span>
+                <span>CERTIFYHUMAN</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html#how" data-i18n="nav.how">Jak to działa</a>
+                <a href="apply.html" class="active" data-i18n="nav.generate">Wydaj certyfikat</a>
+                <a href="verify.html" class="nav-link-verify" data-i18n="nav.verify">Zweryfikuj kod</a>
+                <a href="about.html" data-i18n="nav.about">O nas</a>
+            </div>
+            <div class="nav-actions">
+                <a href="apply.html" class="nav-cta">
+                    <span data-i18n="nav.cta">Get certificate</span>
+                </a>
+                <button class="lang-toggle" id="langToggle" type="button" aria-label="Change language">
+                    <span class="lang-flag" id="langFlag" aria-hidden="true">🇺🇸</span>
+                    <span class="lang-label" id="langLabel">EN</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="section-grid" style="margin-top: 4rem;">
+            <div class="card" style="max-width: 800px; margin: 0 auto;">
+                <h3 data-i18n="form.heading">Wydaj certyfikat (beta)</h3>
+                <p data-i18n="form.lead">Uzupełnij brief treści, wybierz deklarację AI i dołącz dowody pracy. W sekundę
+                    otrzymasz numer CH oraz QR do publikacji.</p>
+
+                <div class="pricing-badge"
+                    style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0; text-align: center; border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <strong style="color: #10b981; font-size: 1.2rem;" id="pricingLabel">99 PLN</strong>
+                    <div style="font-size: 0.8rem; opacity: 0.7;" data-i18n="form.pricingSub">Jednorazowa opłata
+                        weryfikacyjna</div>
+                </div>
+
+                <form id="certificateForm">
+                    <div>
+                        <label for="contentTitle" data-i18n="form.titleLabel">Nazwa / tytuł treści</label>
+                        <input type="text" id="contentTitle" placeholder="np. Artykuł: 'Dlaczego AI nie zastąpi ludzi?'"
+                            data-i18n-placeholder="form.titlePlaceholder" required />
+                    </div>
+                    <div>
+                        <label for="creatorName" data-i18n="form.creatorLabel">Autor / marka</label>
+                        <input type="text" id="creatorName" placeholder="Twoje imię / nazwa marki"
+                            data-i18n-placeholder="form.creatorPlaceholder" required />
+                    </div>
+                    <div>
+                        <label for="creatorEmail" data-i18n="form.emailLabel">E-mail (wyślemy tam potwierdzenie)</label>
+                        <input type="email" id="creatorEmail" placeholder="kontakt@twojamarka.com"
+                            data-i18n-placeholder="form.emailPlaceholder" required />
+                    </div>
+                    <div>
+                        <label for="contentType" data-i18n="form.typeLabel">Typ treści</label>
+                        <select id="contentType" required>
+                            <option value="" data-i18n="form.typeDefault">Wybierz...</option>
+                            <option value="article" data-i18n="form.typeArticle">Artykuł / tekst</option>
+                            <option value="video" data-i18n="form.typeVideo">Wideo / content social</option>
+                            <option value="image" data-i18n="form.typeImage">Grafika / zdjęcie</option>
+                            <option value="audio" data-i18n="form.typeAudio">Audio / podcast / muzyka</option>
+                            <option value="other" data-i18n="form.typeOther">Inne</option>
+                        </select>
+                    </div>
+                    <div>
+                        <span class="label" data-i18n="form.aiLabel">Deklaracja użycia AI</span>
+                        <div class="inline-options">
+                            <label>
+                                <input type="radio" name="aiUsage" value="no-ai" required />
+                                <span data-i18n="form.aiNoAi">100% bez AI (No-AI)</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="aiUsage" value="ai-assisted" />
+                                <span data-i18n="form.aiAssisted">Z pomocą AI (AI-Assisted)</span>
+                            </label>
+                            <label style="opacity:0.35; pointer-events:none;">
+                                <input type="radio" disabled />
+                                <span data-i18n="form.aiDisabled">100% AI (nieobsługiwane)</span>
+                            </label>
+                        </div>
+                        <div class="hint" data-i18n="form.aiHint" data-i18n-type="html">
+                            Akceptujemy tylko treści, gdzie <strong>człowiek jest głównym autorem</strong>.
+                            Wersja 100% AI nie otrzyma certyfikatu.
+                        </div>
+                    </div>
+                    <div>
+                        <label for="contentDescription" data-i18n="form.processLabel">Proces tworzenia (opis dla
+                            certyfikatora)</label>
+                        <textarea id="contentDescription"
+                            placeholder="Opisz, jak powstawała treść: narzędzia, etapy, udział ludzi vs AI. To pole pomaga w samo-weryfikacji."
+                            data-i18n-placeholder="form.processPlaceholder"></textarea>
+                    </div>
+
+                    <div>
+                        <label for="evidenceFiles" data-i18n="form.attachmentsLabel">Załączniki (dowody pracy własnej,
+                            maks. 5 plików)</label>
+                        <input type="file" id="evidenceFiles" multiple accept="image/*,.pdf,.doc,.docx,.txt,.zip" />
+                        <div class="hint" data-i18n="form.attachmentsHint">
+                            Dołącz szkice, screeny z procesu lub inne dowody pracy własnej. W tej wersji beta pliki
+                            pozostają wyłącznie w Twojej przeglądarce.
+                        </div>
+                        <ul id="evidenceList" class="evidence-list"></ul>
+                    </div>
+
+                    <div>
+                        <span class="label" data-i18n="form.paymentLabel">Płatność i aktywacja</span>
+                        <div class="hint" data-i18n="form.paymentHint">
+                            Kliknięcie przycisku uruchamia przykładowy checkout i natychmiast aktywuje certyfikat w tej
+                            wersji prezentacyjnej.
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <label
+                                style="display: flex; gap: 0.5rem; align-items: flex-start; font-size: 0.9rem; color: var(--text-secondary);">
+                                <input type="checkbox" id="waiverCheckbox" required />
+                                <span data-i18n="form.waiverLabel">Wyrażam zgodę na rozpoczęcie świadczenia usługi
+                                    (weryfikacji i wydania certyfikatu) przed upływem 14-dniowego terminu do odstąpienia
+                                    od umowy i przyjmuję do wiadomości, że po spełnieniu świadczenia przez
+                                    przedsiębiorcę utracę prawo do odstąpienia od umowy.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <span class="icon" aria-hidden="true">⚡</span>
+                        <span data-i18n="form.submit">Wygeneruj certyfikat + kod + QR</span>
+                    </button>
+                </form>
+
+                <div id="codeResult" class="code-result" aria-live="polite">
+                    <div>
+                        <div class="code-block">
+                            <span data-i18n="code.label">Kod certyfikatu:</span>
+                            <strong id="generatedCode">CH-XXXX-XXXX</strong>
+                        </div>
+                        <div class="code-meta" id="codeMeta"></div>
+                        <div class="code-meta" data-i18n="code.instructions">
+                            Możesz wkleić ten kod w opis treści lub osadzić poniższy QR.
+                            Odbiorca po wejściu na stronę i wpisaniu kodu (lub skanie QR)
+                            zweryfikuje status certyfikatu.
+                        </div>
+                        <div id="attachmentPreview" class="attachment-preview"></div>
+                    </div>
+                    <div class="qr-wrapper" aria-hidden="true">
+                        <div id="qrcode"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div>
+            <span data-i18n="footer.disclaimer">CertifyHuman przetwarza dane zgodnie z RODO.</span>
+            <p style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.8;" data-i18n="footer.cookies">Serwis
+                wykorzystuje pliki cookies...</p>
+            <a href="rodo.html" data-i18n="footer.rodoLink">Polityka Prywatności</a> | <a
+                href="terms.html">Regulamin</a>
+        </div>
+    </footer>
+
+    <!-- MODALS -->
+    <div id="paymentModal" class="modal-overlay" aria-hidden="true">
+        <div class="modal">
+            <div class="modal-icon">💳</div>
+            <h3 data-i18n="modal.paymentTitle">Oczekiwanie na płatność</h3>
+            <p data-i18n="modal.paymentDesc">Twój certyfikat został wstępnie utworzony. Aby go aktywować i przesłać do
+                weryfikacji, prosimy o dokonanie płatności.</p>
+            <a id="paymentLinkBtn" href="#" target="_blank" class="btn-primary"
+                style="display: inline-block; text-decoration: none; margin: 1rem 0;">
+                <span data-i18n="modal.payNow">Opłać certyfikat</span>
+            </a>
+            <p class="hint" data-i18n="modal.paymentHint">Po dokonaniu płatności wróć tutaj, aby zobaczyć potwierdzenie.
+            </p>
+            <button class="btn-ghost" onclick="closeModal('paymentModal')" data-i18n="modal.close">Zamknij</button>
+            <button class="btn-ghost" onclick="simulatePaymentSuccess()" style="font-size: 0.8rem; opacity: 0.5;">(Demo:
+                Symuluj sukces)</button>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal-overlay" aria-hidden="true">
+        <div class="modal">
+            <div class="modal-icon">🚀</div>
+            <h3 data-i18n="modal.successTitle">Wysłano do akceptacji</h3>
+            <p data-i18n="modal.successDesc">Dziękujemy! Twój certyfikat trafił do kolejki weryfikacyjnej. Po
+                zatwierdzeniu przez administratora otrzymasz powiadomienie mailowe.</p>
+            <div class="code-block" style="margin: 1rem 0;">
+                <span data-i18n="code.label">Kod referencyjny:</span>
+                <strong id="successCode">CH-XXXX-XXXX</strong>
+            </div>
+            <div id="successQr" style="display: flex; justify-content: center; margin-bottom: 1rem;"></div>
+            <button class="btn-primary" onclick="closeModal('successModal')" data-i18n="modal.ok">Rozumiem</button>
+        </div>
+    </div>
+
+</body>
+
+</html>
