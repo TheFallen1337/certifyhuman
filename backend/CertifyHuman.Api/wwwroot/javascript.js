@@ -438,6 +438,8 @@ function setLanguage(lang) {
 function updatePricing() {
     const el = document.getElementById("pricingLabel");
     if (!el) return;
+
+    // Force update based on currentLang
     if (currentLang === "pl") {
         el.textContent = "99 PLN";
     } else {
